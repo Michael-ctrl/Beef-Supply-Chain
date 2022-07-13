@@ -12,26 +12,31 @@ Blockchain Management of Beef Supply Chain
   * Sync essential data(database and on-chain) when create/destruct event happens
   
 ### Tokenisation contract (Michael ERC-721, Marcus Voting)
-  * minting_contract()
   * self-destruct(only from the owner of the token)
   * ERC-721
   * Vote(sender == regulator)
   * Final_vote() 
-  * data: (enum)grading,
+  * Data: (enum)grading,
           (address)precedence token,
           (string)short description,
           (int)weight of meet,
           (address)original farmer ID
 
+### Minting_contract (Zac)
+ * create the tokenisation contract() return address[] contract
+
 ### Database (Cooper)
-  * 
+  * Images for grading
+  * Farm data connected to source of token
 
 ### Consumer UI (Marcus)
-  *  
+  *  Trace back supply chain by the given contract ID
 
 ### Business UI (Cooper)
   * create_contract(only by farmer, struct description of item) 
     * create token contract
     * store contract value and item in database
+  * Trace back supply chain by the given contract ID
 
 ### Regulator UI (Marcus)
+  *  Vote the meet by the given token ID
