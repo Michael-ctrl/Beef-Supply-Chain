@@ -18,7 +18,8 @@ Blockchain Management of Beef Supply Chain
   * data: grading, array of previous token
 
 ### Database (Cooper)
-  * 
+  * Images for grading
+  * Farm data connected to source of token
 
 #### Consumer UI (Marcus)
   *  
