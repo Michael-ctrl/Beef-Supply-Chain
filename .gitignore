@@ -1,6 +1,8 @@
 # Our Bits
 .vscode/
 build/*
+eth_accounts/*
+eth_providers/*
 
 ######## Node Template ########
 # Logs
