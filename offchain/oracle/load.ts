@@ -6,7 +6,7 @@ function findImports(importPath: string) {
         return {
             contents: fs.readFileSync(`smart_contracts/${importPath}`, 'utf8')
         };
-    } catch (e) {
+    } catch (e: any) {
         return {
             error: e.message
         };
