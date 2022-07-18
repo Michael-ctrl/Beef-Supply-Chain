@@ -10,7 +10,7 @@ interface ERC165 {
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
 
-///contract SupplyChain is MeatOwnerControl {}
+
 
 /// contract MeatNFT is ERC165, ERC721, ERC721Enumerable, ERC721Metadata, supportsInterface {
 contract MeatNFT is ERC165 {
@@ -40,5 +40,19 @@ contract MeatNFT is ERC165 {
 }
 
 contract MeatOwnerControl is MeatNFT {
+    string public description;
+    address[] public sources;
 
+    constructor (string descr, address[] inputs) {
+        description = descr;
+        sources = inputs;
+    }
+}
+
+contract SupplyChain is MeatOwnerControl {
+
+
+    function disableToken() public {
+        // check if the splitmerge or retailer is calling it and then selfdestruct
+    }
 }
