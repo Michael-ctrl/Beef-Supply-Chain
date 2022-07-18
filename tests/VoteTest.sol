@@ -19,7 +19,7 @@
 pragma solidity >=0.8.00 <0.9.0;
 import "remix_tests.sol"; // this import is automatically injected by Remix. import "remix_accounts.sol";
 import "remix_accounts.sol";
-import "../Contract/LunchVenue_updated.sol";
+import "../smartcontracts/SupplyChain.sol";
 
 // File name has to end with '_test.sol', this file can contain more than one testSuite contracts
 /// Inherit 'LunchVenue' contract
