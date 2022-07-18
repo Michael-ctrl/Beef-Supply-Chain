@@ -46,48 +46,6 @@ contract LunchVenueTest is LunchVenue {
         Assert.equal(manager, acc0, 'Manager should be acc0');
     }
 
-    /// Add lunch venue as manager
-    /// When msg.sender isn't specified , default account (i.e., account -0) is considered as the sender
-    function setLunchVenue() public {
-        Assert.equal(addVenue('Courtyard Cafe'), 1, 'Should be equal to 1'); 
-        Assert.equal(addVenue('Uni Cafe'), 2, 'Should be equal to 2');
-    }
-
-    /// Try to add lunch venue as a user other than manager. This should fail 
-    /// #sender: account-1
-    function setLunchVenueFailure() public {
-        try this.addVenue('Atomic Cafe') returns (uint v) {
-            Assert.ok(false, 'Method execution should fail'); 
-        } catch Error(string memory reason) {
-            // Compare failure reason, check if it is as expected
-            Assert.equal(reason, 'Can only be executed by the manager', 'Failed withunexpected reason');
-        } catch (bytes memory /*lowLevelData*/) {
-            Assert.ok(false, 'Failed unexpected'); 
-        }
-    }
-
-    /// Set friends as account-0
-    /// #sender doesn't need to be specified explicitly for account-0
-    function setFriend() public {
-        Assert.equal(addFriend(acc0, 'Alice'), 1, 'Should be equal to 1');
-        Assert.equal(addFriend(acc1, 'Bob'), 2, 'Should be equal to 2'); 
-        Assert.equal(addFriend(acc2, 'Charlie'), 3, 'Should be equal to 3');
-        Assert.equal(addFriend(acc3, 'Eve'), 4, 'Should be equal to 4');
-    }
-
-    /// Try adding friend as a user other than manager. This should fail 
-    /// #sender: account-2
-    function setFriendFailure() public {
-        try this.addFriend(acc4, 'Daniels') returns (uint f) { 
-            Assert.ok(false, 'Method execution should fail');
-        } catch Error(string memory reason) {
-            // Compare failure reason, check if it is as expected
-            Assert.equal(reason, 'Can only be executed by the manager', 'Failed with unexpected reason');
-        } catch (bytes memory /*lowLevelData*/) { 
-            Assert.ok(false, 'Failed unexpected');
-        } 
-    }
-
     /// test start voting function
     /// #sender: account-1
     function StartVoteFailed() public {    
@@ -108,23 +66,9 @@ contract LunchVenueTest is LunchVenue {
         Assert.ok(startVoting(), 'manager Should be able to start vote');
     }
 
-    /// Try adding friend during voting phase, not allowable.
-    /// #sender: account-0
-    function setFriendOpening() public {
-        try this.addFriend(acc4, 'Daniels') returns (uint f) { 
-            Assert.ok(false, 'Method execution should fail');
-        } catch Error(string memory reason) {
-            // Compare failure reason, check if it is as expected
-            Assert.equal(reason, 'Can only be executed by the manager', 'Failed with unexpected reason');
-        } catch (bytes memory /*lowLevelData*/) { 
-            Assert.ok(false, 'Failed unexpected');
-        } 
-    }
-
     /// Function to test self destruct functions, uncomment to test it, while unccoment, other test case might fail
     /// sender: account-0
     // function disableContract() public {
-
     //     forceDisable();
 
     //     // test add friend
@@ -156,7 +100,6 @@ contract LunchVenueTest is LunchVenue {
     //     } catch (bytes memory /*lowLevelData*/) {
     //         Assert.ok(false, 'Failed unexpectedly'); 
     //     }
-
     // }
 
     /// Vote as Bob (acc1)
@@ -195,11 +138,11 @@ contract LunchVenueTest is LunchVenue {
         }
     }
     
-    /// Verify lunch venue is set correctly
+    /// Verify result is set correctly
     function lunchVenueTest() public {
         Assert.equal(votedVenue, 'Uni Cafe', 'Selected venue should be Uni Cafe'); 
     }
-     
+    
     /// Verify voting after vote closed. This should fail 
     /// #sender: account -2
     function voteAfterClosedFailure() public {
