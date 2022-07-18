@@ -45,26 +45,37 @@ contract MeatOwnerControl is MeatNFT {
 
 contract SupplyChain is MeatOwnerControl {
     string public description;
+    string public location;
+    uint public dateCreated;
     uint public weight;
     uint public grade;
     address[] public sources;
+    address private tokenFactoryAddress;
 
     bool private writable;
 
-    constructor (string descr, address[] inputs, uint weight) {
+    constructor (string memory descr, string memory loc, address[] memory inputs, uint grams) {
         description = descr;
+        location = loc;
         sources = inputs;
+        weight = grams;
+        dateCreated = block.timestamp;
+        tokenFactoryAddress = msg.sender;
+        writable = true;
     }
     // TODO add a bunch of functions for editing info 
+    function iamTokenTest() public returns (bool t) {
+        return true;
+    }
 
-    function disableToken() public {
-        // check if the splitMerge or retailer is calling it
-        if (msg.sender == splitMergeAddress) {
-            
+    function disableToken() external disabled {
+        // check if the splitMerge is calling it
+        if (msg.sender == tokenFactoryAddress) {
+            writable = false;
         }
     }
 
-    modifier readOnly() {
+    modifier disabled() {
         require (writable, "This token can't be edited or interacted with any more");
         _;
     }

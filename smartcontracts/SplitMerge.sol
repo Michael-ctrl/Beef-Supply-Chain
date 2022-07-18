@@ -1,41 +1,34 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.4.20;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 
 import "./SupplyChain.sol";
 
 contract SplitMergeFactory {
-
-    // Requires experimental encoder to have a struct array as input
-    // Can change to a mapping (string => uint) but the input would also need to include
-    // a list of descriptions
     struct OutputMeatTokens {
         string description;
+        string location;
         uint quantity;
+        uint weight;
     }
 
     address private owner;
-    address[] private outputs;
 
     constructor() public {
         owner = msg.sender;
     }
 
-    function splitMerge(address[] inputs, OutputMeatTokens[] outputInfo) public {
+    function splitMerge(address[] calldata inputs, OutputMeatTokens[] calldata outputInfo) public {
+        address[] memory outputs;
         disableInputs(inputs);
         for (uint i = 0; i < outputInfo.length; i++) {
             for (uint j = 0; j < outputInfo[i].quantity; j++) {
-                address token = address(
-                    new MeatOwnerControl(
-                        outputInfo[i].description, 
-                        inputs
-                    ));
-                // update the minting if the constructor of SupplyChain changes
-                outputs.push(token);
+                outputs.push(mintToken(outputInfo[i].description, outputInfo[i].location, inputs, outputInfo[i].weight));
             }
         }
+        return outputs;
     }
 
     function disableInputs(address[] inputs) private {
@@ -46,11 +39,23 @@ contract SplitMergeFactory {
         }
     }
 
-    function disable() public restricted {
-        
+    function mintToken(string description, string location, address[] sources, uint weight) public returns (address token) {
+        return address(new SupplyChain(description, location, sources, weight));
+        // update the minting if the constructor of SupplyChain changes
     }
 
-    modifier restricted() {
+    function mintTokens(string description, string location, uint weight, uint quantity) public {
+        address[quantity] tokens;
+        for (uint i = 0; i < quantity; i++) {
+            mintToken(description, location, new address[] (0), weight);
+        }
+    }
+
+    function disable() public admin {
+        selfdestruct(payable(owner));
+    }
+
+    modifier admin() {
         require (msg.sender == owner, "Can only be executed by the owner");
         _;
     }
