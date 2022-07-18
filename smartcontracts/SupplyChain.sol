@@ -40,19 +40,32 @@ contract MeatNFT is ERC165 {
 }
 
 contract MeatOwnerControl is MeatNFT {
-    string public description;
-    address[] public sources;
-
-    constructor (string descr, address[] inputs) {
-        description = descr;
-        sources = inputs;
-    }
+    
 }
 
 contract SupplyChain is MeatOwnerControl {
+    string public description;
+    uint public weight;
+    uint public grade;
+    address[] public sources;
 
+    bool private writable;
+
+    constructor (string descr, address[] inputs, uint weight) {
+        description = descr;
+        sources = inputs;
+    }
+    // TODO add a bunch of functions for editing info 
 
     function disableToken() public {
-        // check if the splitmerge or retailer is calling it and then selfdestruct
+        // check if the splitMerge or retailer is calling it
+        if (msg.sender == splitMergeAddress) {
+            
+        }
+    }
+
+    modifier readOnly() {
+        require (writable, "This token can't be edited or interacted with any more");
+        _;
     }
 }
