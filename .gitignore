@@ -1,6 +1,7 @@
 # Our Bits
 .vscode/
-build/*
+**/build/*
+/ui/**/build/*
 eth_accounts/*
 eth_providers/*
 
