@@ -40,7 +40,9 @@ contract SplitMergeFactory {
     }
 
     function mintToken(string description, string location, address[] sources, uint weight) public returns (address token) {
-        return address(new SupplyChain(description, location, sources, weight));
+        address tokenAddress = address(new SupplyChain(description, location, sources, weight));
+        emit Mint(tokenAddress, owner);
+        return tokenAddress;
         // update the minting if the constructor of SupplyChain changes
     }
 
