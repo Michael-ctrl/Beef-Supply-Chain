@@ -60,18 +60,19 @@ abstract contract Oracle is OracleInterface {
     }
 }
 
-contract TemperatureOracle is Oracle {
+contract BeefOracle is Oracle {
     constructor(address serverAddr) Oracle(serverAddr) {}
 }
 
-abstract contract TemperatureOracleClient is OracleClient {
+abstract contract BeefOracleClient is OracleClient {
     constructor(address oracleAd) OracleClient(oracleAd) {}
 
-    function requestTemperatureFromOracle(
-        string memory city1,
-        string memory city2
+    function requestBeefDataFromOracle(
+        // Memory variables go here e.g.
+        string memory something,
+        string memory somethingElse
     ) internal returns (uint256) {
-        requestDataFromOracle(abi.encode(city1, city2));
+        requestDataFromOracle(abi.encode(something, somethingElse));
         return _requestCounter;
     }
 
@@ -81,12 +82,12 @@ abstract contract TemperatureOracleClient is OracleClient {
         oracleOnly
     {
         (int256 temp1, int256 temp2) = abi.decode(data, (int256, int256));
-        receiveTemperatureFromOracle(requestId, temp1, temp2);
+        receiveBeefDataFromOracle(requestId, temp1, temp2);
     }
 
-    function receiveTemperatureFromOracle(
+    function receiveBeefDataFromOracle(
         uint256 requestId,
-        int256 temperature1,
-        int256 temperature2
+        int256 something,
+        int256 somethingElse
     ) internal virtual;
 }
