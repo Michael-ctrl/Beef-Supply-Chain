@@ -61,7 +61,7 @@ if (shellArgs.length < 1) {
             try {
                 let account = getAccount(web3, "user");
                 let loaded = loadCompiledSols(["SplitMerge"]);
-                let contract = await deployContract(web3!, account, loaded.contracts["SplitMerge"]["SplitMerge"].abi, loaded.contracts["SplitMerge"]["SplitMerge"].evm.bytecode.object);
+                let contract = await deployContract(web3!, account, loaded.contracts["SplitMerge"]["SplitMergeFactory"].abi, loaded.contracts["SplitMerge"]["SplitMergeFactory"].evm.bytecode.object);
                 console.log("user app contract address: " + contract.options.address);
             } catch (error) {
                 console.error("error deploying contract");
@@ -85,16 +85,16 @@ if (shellArgs.length < 1) {
             let contract!: Contract;
             try {
                 let loaded = loadCompiledSols(["SplitMerge"]);
-                contract = new web3.eth.Contract(loaded.contracts["SplitMerge"]["SplitMerge"].abi, shellArgs[1]);
+                contract = new web3.eth.Contract(loaded.contracts["SplitMerge"]["SplitMergeFactory"].abi, shellArgs[1]);
             } catch (error) {
                 console.error("error loading contract for listening");
                 console.error(error);
             }
 
-            // Listen for minting events
+            // Listen for minting events (as emitted by the SC)
             contract.events.Mint()
                 .on("connected", function(subscriptionId: any) {
-                    console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId);
+                    console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId); // just log for now
                 })
                 .on("data", function(event: any) {
                     console.log(event);
