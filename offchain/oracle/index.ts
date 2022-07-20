@@ -3,14 +3,13 @@ import { WebsocketProvider, Account } from 'web3-core';
 import { deployContract } from './deploy';
 import { handleRequestEvent } from './listen';
 import { loadCompiledSols } from './load';
-import { grabTemperature } from './temperature_grabber';
 import { methodSend } from './send';
 import { Contract } from 'web3-eth-contract';
 let fs = require('fs');
 
 function initializeProvider(): WebsocketProvider {
     try {
-        let provider_data = fs.readFileSync('eth_providers/providers.json');
+        let provider_data = fs.readFileSync('json/providers.json');
         let provider_json = JSON.parse(provider_data);
         let provider_link = provider_json["provider_link"];
         return new Web3.providers.WebsocketProvider(provider_link);
@@ -19,9 +18,11 @@ function initializeProvider(): WebsocketProvider {
     }
 }
 
+// Account #1 Is the owner of the oracle
+// Account #2 Is the owner of the contract to be deployed and monitored 
 function getAccount(web3: Web3, name: string): Account {
     try {
-        let account_data = fs.readFileSync('eth_accounts/accounts.json');
+        let account_data = fs.readFileSync('json/accounts.json');
         let account_json = JSON.parse(account_data);
         let account_pri_key = account_json[name]["pri_key"];
         return web3.eth.accounts.wallet.add('0x' + account_pri_key);
