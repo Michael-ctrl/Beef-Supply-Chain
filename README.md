@@ -44,6 +44,17 @@ Supply Chain for Token 0x323746736269
 [n] 0x40389435773721 - Local Butcher Co.
 The above list should actually be a tree-like structure
 
+     Farmer A Co.    Farmer B Co.
+     0x4456669423    0x4038756732
+        \                /
+         \              /
+         Mincer Pty. Ltd.
+         0x54845739367934
+                |
+                |
+         Local Butcher Co.
+         0x348057643567834
+  
 ==========================================
 Information for Token 0x323746736269
 ==========================================
