@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.0;
-pragma experimental ABIEncoderV2;
 
 
 import "./SupplyChain.sol";
 
-contract SplitMergeFactory {
+contract TokenFactory {
+
     struct OutputMeatTokens {
         string description;
         string location;
@@ -16,22 +16,24 @@ contract SplitMergeFactory {
 
     address private owner;
 
-    constructor() public {
+    constructor() {
         owner = msg.sender;
     }
 
-    function splitMerge(address[] calldata inputs, OutputMeatTokens[] calldata outputInfo) public {
-        address[] memory outputs;
+    function splitMerge(address[] calldata inputs, OutputMeatTokens[] calldata outputInfo) external returns (address[] memory tokens) {
         disableInputs(inputs);
+        address[] memory outputs;
+        uint a = 0;
         for (uint i = 0; i < outputInfo.length; i++) {
             for (uint j = 0; j < outputInfo[i].quantity; j++) {
-                outputs.push(mintToken(outputInfo[i].description, outputInfo[i].location, inputs, outputInfo[i].weight));
+                outputs[a] = mintToken(outputInfo[i].description, outputInfo[i].location, inputs, outputInfo[i].weight);
+                a++;
             }
         }
         return outputs;
     }
 
-    function disableInputs(address[] inputs) private {
+    function disableInputs(address[] calldata inputs) private {
         for (uint i = 0; i < inputs.length; i++) {
             SupplyChain(inputs[i]).disableToken();
             // Make sure the reference to the token contract works and disable token is implmeneted
@@ -39,16 +41,17 @@ contract SplitMergeFactory {
         }
     }
 
-    function mintToken(string description, string location, address[] sources, uint weight) public returns (address token) {
+    function mintToken(string calldata description, string calldata location, address[] memory sources, uint weight) public returns (address token) {
         return address(new SupplyChain(description, location, sources, weight));
         // update the minting if the constructor of SupplyChain changes
     }
 
-    function mintTokens(string description, string location, uint weight, uint quantity) public {
-        address[quantity] tokens;
+    function mintNewTokens(string calldata description, string calldata location, uint weight, uint quantity) public {
+        //address[] memory tokens = new address[](quantity);
         for (uint i = 0; i < quantity; i++) {
             mintToken(description, location, new address[] (0), weight);
         }
+        //return tokens;
     }
 
     function disable() public admin {
