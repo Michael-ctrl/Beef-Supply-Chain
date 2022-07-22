@@ -3,9 +3,10 @@ pragma solidity ^0.8.0;
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MeatNFT is ERC721URIStorage {
+contract MeatNFT is ERC721URIStorage, AccessControl {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -77,9 +78,17 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
     mapping (uint256 => MeatInfo) public idToInfo;
     // mapping (uint256 => History) public idToHistory;
 
-    constructor() public ERC721("MeatNFT", "BFT") {}
+    bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE"); // A role that allows individuals to mint NFTs
+    bytes32 private constant BURNER_ROLE = keccak256("BURNER_ROLE"); // A role that allows individuals to burn NFTs
+    bytes32 private constant VOTER_ROLE = keccak256("VOTER_ROLE"); // A role that allows individuals to vote on grading
 
-    function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _dateCreated, uint _weight, uint _grade) public returns (uint256) {
+    constructor() ERC721("MeatNFT", "BFT") {
+        // Grant the contract deployer the default admin role
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
+    }
+
+    function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _dateCreated, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
@@ -89,13 +98,25 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
         m.location = _location;
         m.dateCreated = _dateCreated;
         m.weight = _weight;
-        m.grade = _grade;
+        m.grade = 0;
         m.voted = false;
         idToInfo[_tokenIds.current()] = m;
 
         _tokenIds.increment();
 
         return newItemId;
+    }
+
+    function makeMinter(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(MINTER_ROLE, account);
+    }
+
+    function makeBurner(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(BURNER_ROLE, account);
+    }
+
+    function makeVoter(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(VOTER_ROLE, account);
     }
 
     /*
@@ -120,5 +141,8 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
 
     }
     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 
 }
