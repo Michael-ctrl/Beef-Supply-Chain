@@ -97,7 +97,14 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
 
         return newItemId;
     }
-
+    
+    // Interaction with voting contract
+    Voting voting_contract;
+    function requestVoting(uint256 tokenId, address voting_contract_addr){
+        voting_contract = Voting(voting_contract_addr);
+        voting_contract.meat_enqueue(tokenId);
+    }
+    
     function getGradingData(uint256 tokenId, uint grade) {
         idToInfo[tokenId].grade = grade;
     }
