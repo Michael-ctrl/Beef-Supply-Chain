@@ -14,7 +14,7 @@ contract Voting{
     uint public numVotes = 0;
     uint grade_total = 0;
     address public manager;                     //Manager
-    MeatNFT meatnft_contract;
+    SupplyChain meatnft_contract;
     //mapping for queue
     mapping(uint256 => uint256) public queue;
     uint256 queue_first = 1;
@@ -38,7 +38,7 @@ contract Voting{
 
     // update the external function address
     function get_meatnft(address addr) public {
-        meatnft_contract = MeatNFT(addr);
+        meatnft_contract = SupplyChain(addr);
     } 
 
     //  function for meat grade enqueue
@@ -140,6 +140,6 @@ contract Voting{
 
 }
 
-contract MeatNFT{
+contract SupplyChain{
     function set_meat_grade(uint256 grade, uint256 toeknid) public {}
 }
