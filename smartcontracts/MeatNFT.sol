@@ -119,6 +119,17 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
         _grantRole(VOTER_ROLE, account);
     }
 
+    // Interaction with voting contract
+    Voting voting_contract;
+    function requestVoting(uint256 tokenId, address voting_contract_addr){
+        voting_contract = Voting(voting_contract_addr);
+        voting_contract.meat_enqueue(tokenId);
+    }
+    
+    function getGradingData(uint256 tokenId, uint grade) {
+        idToInfo[tokenId].grade = grade;
+    }
+
     /*
     // Check if tokenID is owned by msg.sender and then append to the voting list
     function intiateVoting(uint256 tokenId) {
@@ -127,7 +138,7 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
     }
 
     function getGradingData(uint256 tokenId, uint grade) {
-
+        
     }
 
     // 
@@ -145,4 +156,8 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
         return super.supportsInterface(interfaceId);
     }
 
+}
+
+contract Voting{
+    function meat_enqueue(uint256 meatid) public{}
 }
