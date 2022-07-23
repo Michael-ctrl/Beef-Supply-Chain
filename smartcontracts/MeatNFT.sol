@@ -79,6 +79,9 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         m.voted = false;
         idToInfo[_tokenIds.current()] = m;
 
+        ownersHistory[_tokenIds.current()] = [msg.sender];
+        sourcesHistory[_tokenIds.current()] = new uint256[](0);
+
         _tokenIds.increment();
 
         
@@ -105,14 +108,15 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         require(ownerOf(tokenId) == msg.sender, "Meat voting can only be request by the NFT owner");
         voting_contract = Voting(voting_contract_addr);
         voting_contract.meat_enqueue(tokenId);
+        idToInfo[tokenId].voted = true;
     }
     
     function getGradingData(uint256 tokenId, uint grade) public {
         idToInfo[tokenId].grade = grade;
     }
 /*
-    function splitMerge() {
-
+    function splitMerge(uint256[] inputs, ) {
+        _mint
     }*/
 
     /*
