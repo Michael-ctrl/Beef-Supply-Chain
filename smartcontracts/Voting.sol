@@ -29,7 +29,7 @@ contract Voting{
     uint public result_grade = 0;
     uint256 public current_meat = 0;
     uint blocklimit  = 100;// block limit used for timeout
-
+    uint required_vote = 0;
     // Creates a new lunch venue contract
     constructor () {
         manager = msg.sender; //Set contract creator as manager 
@@ -42,7 +42,8 @@ contract Voting{
     } 
 
     //  function for meat grade enqueue
-    function meat_enqueue(uint256 meat) public{
+    function meat_enqueue(uint256 meat, uint256 quorum) public{
+        required_vote = quorum;
         queue_last += 1;
         queue[queue_last] = meat;
         if(state == voteState.create)
@@ -93,7 +94,7 @@ contract Voting{
             validVote = true;
         }   
 
-        if (numVotes > 4 ) { //Quorum is met
+        if (numVotes > required_vote-1) { //Quorum is met
             finalResult(); 
         }
         return validVote; 
