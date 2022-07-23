@@ -1,14 +1,17 @@
 import chalk from 'chalk'
 import Web3 from 'web3'
 import { WebsocketProvider, Account } from 'web3-core'
+
+
 import { addWallet, initializeProvider } from './business'
+import { methodSend } from './transact'
 
 var vorpal = require('vorpal')();
 
 let web3: Web3 = new Web3(initializeProvider());
 let account: Account;
 
-// Wallet Setup Command
+// Wallet Setup
 vorpal
     .command('setupwallet', 'Setup the business wallet')
     .option('-k, --key <privateKey>', 'Private key of the wallet')
@@ -35,7 +38,7 @@ vorpal
         }
     });
 
-// List Tokens in Wallet Command
+// List Tokens in Wallet
 vorpal
     .command('check', 'List tokens in your wallet')
     .alias('balance')
@@ -50,10 +53,28 @@ vorpal
             self.log('Balance: ' + web3.utils.fromWei(balance, 'ether') + ' ETH');
 
             // Get list of NFTs
-            
+
             callback();
         }
     });
+
+// Transact Ether
+vorpal
+    .command('send <amount> <address>', 'Send ether to an address')
+    .types({string: ['_']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+            callback();
+        } else {
+            //send eth
+            self.log(chalk.greenBright('Transaction sent '));
+            callback();
+        }
+    });
+
 
 vorpal.run = function (argv: any, options: any, done: any) {
   // Modification of code found here: https://github.com/dthree/vorpal/blob/master/lib/vorpal.js#L155-L184
