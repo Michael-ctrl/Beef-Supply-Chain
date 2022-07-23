@@ -53,15 +53,16 @@ if (shellArgs.length < 1) {
     // Deploy contract to be listened to and return address
     if (cmd0 == "deploy") {
         if (shellArgs.length < 2) {
-            console.error("e.g. node index.js deploy oracle");
+            console.error("e.g. node index.js deploy MeatNFT");
             process.exit(1);
         }
 
-        if (shellArgs[1] == "SplitMerge") {
+        if (shellArgs[1] == "MeatNFT") {
             try {
                 let account = getAccount(web3, "user");
-                let loaded = loadCompiledSols(["SplitMerge"]);
-                let contract = await deployContract(web3!, account, loaded.contracts["SplitMerge"]["SplitMergeFactory"].abi, loaded.contracts["SplitMerge"]["SplitMergeFactory"].evm.bytecode.object);
+                let loaded = loadCompiledSols(["MeatNFT"]);
+                //console.log(loaded)
+                let contract = await deployContract(web3!, account, loaded.contracts["MeatNFT"]["MeatNFT"].abi, loaded.contracts["MeatNFT"]["MeatNFT"].evm.bytecode.object);
                 console.log("user app contract address: " + contract.options.address);
             } catch (error) {
                 console.error("error deploying contract");
@@ -80,19 +81,20 @@ if (shellArgs.length < 1) {
             process.exit(1);
         }
 
-        if (shellArgs[1] == "SplitMerge") {
+        if (shellArgs[1] == "MeatNFT") {
             // Load the contract to be listened to
             let contract!: Contract;
             try {
-                let loaded = loadCompiledSols(["SplitMerge"]);
-                contract = new web3.eth.Contract(loaded.contracts["SplitMerge"]["SplitMergeFactory"].abi, shellArgs[1]);
+                let loaded = loadCompiledSols(["MeatNFT"]);
+                let contractAddr = shellArgs[2];
+                contract = new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, contractAddr);
             } catch (error) {
                 console.error("error loading contract for listening");
                 console.error(error);
             }
 
             // Listen for minting events (as emitted by the SC)
-            contract.events.Mint()
+            contract.events.allEvents()
                 .on("connected", function(subscriptionId: any) {
                     console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId); // just log for now
                 })
