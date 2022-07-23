@@ -19,64 +19,38 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         bool voted;
     }
 
-/*
-    struct Node {
-        bytes32 name;     // name of node
-        bytes32 parent;   // parent node’s path
-        bytes32 data;     // node’s data
-        bytes32[] nodes;  // list of linked nodes’ paths
+    // Tree data structure to hold the history of a tokens ownership
+    mapping (uint256 => address[]) ownersHistory;
+    mapping (uint256 => uint256[]) sourcesHistory;
+
+    struct viewHistory {
+        uint256 tokenId;
+        address[] owners;
+        uint256 child;
     }
-    mapping(bytes32 => Node) nodes;
-function get(bytes32 _name, bytes32 _parent) public view returns (bytes32, bytes32, bytes32, bytes32[]) {
-    Node storage node = nodes[keccak256(_parent, _name)];
-    return (node.name, node.parent, node.data, node.nodes);
-}
-    
-function add(bytes32 _name, bytes32 _parent, bytes32 _data) public {
-    require(_name.length > 0);
-    bytes32 path = keccak256(_parent, _name);
-    nodes[path] = Node({
-        name: _name, 
-        parent: _parent, 
-        data: _data, 
-        nodes: new bytes32[](0)
-    });
-    nodes[_parent].nodes.push(path);
-}
-function update(bytes32 _name, bytes32 _parent, bytes32 _data) public {
-    bytes32 path = keccak256(_parent, _name);
-    Node storage node = nodes[path];
-    node.data = _data;
-}
-function remove(bytes32 _name, bytes32 _parent) public {
-    bytes32 path = keccak256(_parent, _name);
-    // allow to remove leaves (node without linked nodes)
-    require(nodes[path].nodes.length == 0);
-    // removes from nodes
-    delete nodes[path];
-    
-    // removes from parent list of nodes
-    bytes32[] storage childs = nodes[_parent].nodes;
-    for (uint256 i = getIndex(childs, path); i < childs.length - 1; i++) {
-        childs[i] = childs[i + 1];
-    }
-    delete childs[childs.length - 1];
-    childs.length--;
-}
-function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint256) {
-    for (uint256 i = 0; i < childs.length; i++) {
-        if (_path == childs[i]) {
-            return i;
+
+    // dfs
+    // call with history empty
+    function traverseHistory(uint256 _tokenId, uint index, uint256 _child, viewHistory[] memory history) private returns (viewHistory[] memory){
+        
+        history[index] = (viewHistory({
+            tokenId: _tokenId, 
+            owners: ownersHistory[_tokenId],
+            child: _child
+        }));
+        index++;
+        for (uint i=0; i<sourcesHistory[_tokenId].length; i++) {
+            history = traverseHistory(sourcesHistory[_tokenId][i], index, _tokenId, history);
+            index++;
         }
+        return history;
     }
-    return childs.length - 1;
-}*/
 
-    // struct History {}
-
+    function getHistory(uint256 _tokenId, uint historySize) public returns (viewHistory[] memory) {
+        return traverseHistory(_tokenId, 0, 0, new viewHistory[](historySize));
+    }
 
     mapping (uint256 => MeatInfo) public idToInfo;
-    // mapping (uint256 => History) public idToHistory;
 
     bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE"); // A role that allows individuals to mint NFTs
     bytes32 private constant BURNER_ROLE = keccak256("BURNER_ROLE"); // A role that allows individuals to burn NFTs
@@ -88,7 +62,7 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
         _setupRole(MINTER_ROLE, msg.sender);
     }
 
-    function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _dateCreated, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
+    function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
@@ -96,13 +70,15 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
         MeatInfo memory m;
         m.description = _description;
         m.location = _location;
-        m.dateCreated = _dateCreated;
+        m.dateCreated = block.timestamp;
         m.weight = _weight;
         m.grade = 0;
         m.voted = false;
         idToInfo[_tokenIds.current()] = m;
 
         _tokenIds.increment();
+
+        
 
         return newItemId;
     }
@@ -129,6 +105,10 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
     function getGradingData(uint256 tokenId, uint grade) {
         idToInfo[tokenId].grade = grade;
     }
+/*
+    function splitMerge() {
+
+    }*/
 
     /*
     // Check if tokenID is owned by msg.sender and then append to the voting list
@@ -142,15 +122,9 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
     }
 
     // 
-    function splitMerge() {
-
-    }
+    
 
     // some edit data functions
-
-    function mintMeatToken (lots of data) {
-
-    }
     */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
