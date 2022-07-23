@@ -8,8 +8,14 @@ Blockchain Management of Beef Supply Chain
   * GetAllTokens(tokens[], input struct, output struct) store AllNewTokens[] on chain; 
   * emit event whenever a split/merge happens to oracle
   
-### Oracle (Cooper)
-  * Sync essential data(database and on-chain) when create/destruct event happens
+### Reverse Oracle (Cooper)
+  * Listen for creation events to create new reference to meat
+  * When split/merge occurs record new `tokenURI` which represents the meat now
+  
+### Database (Cooper)
+  * Receive new `tokenURI` from the reverse oracle
+  * Receive images linked to `tokenId` from business UI
+  * Serve images to regulator UI
   
 ### Tokenisation contract (Michael ERC-721, Marcus Voting)
   * self-destruct(only from the owner of the token)
@@ -25,10 +31,6 @@ Blockchain Management of Beef Supply Chain
 ### Minting_contract (Zac)
  * create the tokenisation contract() return address[] contract
 
-### Database (Cooper)
-  * Images for grading
-  * Farm data connected to source of token
-
 ### Consumer UI (Marcus)
   *  Trace back supply chain by the given contract ID
   * Example output (not final):
@@ -40,7 +42,19 @@ Supply Chain for Token 0x323746736269
 [2] 0x42395070972373 - Abattoir Pty. Ltd.
 ...
 [n] 0x40389435773721 - Local Butcher Co.
+The above list should actually be a tree-like structure
 
+     Farmer A Co.    Farmer B Co.
+     0x4456669423    0x4038756732
+        \                /
+         \              /
+         Mincer Pty. Ltd.
+         0x54845739367934
+                |
+                |
+         Local Butcher Co.
+         0x348057643567834
+  
 ==========================================
 Information for Token 0x323746736269
 ==========================================
@@ -52,10 +66,9 @@ Grade: 7
  * Supply chain implemented by recursive calls through blockchain
 
 ### Business UI (Cooper)
-  * create_contract(only by farmer, struct description of item) 
-    * create token contract
-    * store contract value and item in database
-  * Trace back supply chain by the given contract ID
+  * Enter private key to open the wallet
+  * Support all necessary ERC-721 methods which the business requires
+  * Include a way to send the token to the voting contract
 
 ### Regulator UI (Marcus)
   *  Vote the meet by the given token ID
