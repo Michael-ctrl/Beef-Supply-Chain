@@ -69,6 +69,10 @@ Grade: 7
   * Enter private key to open the wallet
   * Support all necessary ERC-721 methods which the business requires
   * Include a way to send the token to the voting contract
+  
+### Abattoir UI (Cooper)
+  * Connect to off-chain database
+  * Upload data related to tokens
 
 ### Regulator UI (Marcus)
   *  Vote the meet by the given token ID
