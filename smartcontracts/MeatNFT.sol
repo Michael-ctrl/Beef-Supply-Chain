@@ -114,6 +114,7 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
     
     function getGradingData(uint256 tokenId, uint grade) public {
         idToInfo[tokenId].grade = grade;
+        idToInfo[tokenId].voted = true;
     }
 /*
     function splitMerge(uint256[] inputs, ) {
