@@ -3,9 +3,11 @@ let solc = require('solc');
 
 function findImports(importPath: string) {
     try {
-        return {
-            contents: fs.readFileSync(`smartcontracts/${importPath}`, 'utf8')
-        };
+        if (importPath.startsWith('@')) {
+            return {contents: fs.readFileSync(`node_modules/${importPath}`, 'utf8')};
+        } else {
+            return {contents: fs.readFileSync(`smartcontracts/${importPath}`, 'utf8')};
+        }
     } catch (e: any) {
         return {
             error: e.message
