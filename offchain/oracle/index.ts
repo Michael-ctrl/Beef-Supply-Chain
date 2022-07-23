@@ -86,14 +86,15 @@ if (shellArgs.length < 1) {
             let contract!: Contract;
             try {
                 let loaded = loadCompiledSols(["MeatNFT"]);
-                contract = new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, shellArgs[1]);
+                let contractAddr = shellArgs[2];
+                contract = new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, contractAddr);
             } catch (error) {
                 console.error("error loading contract for listening");
                 console.error(error);
             }
 
             // Listen for minting events (as emitted by the SC)
-            contract.events.Mint()
+            contract.events.allEvents()
                 .on("connected", function(subscriptionId: any) {
                     console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId); // just log for now
                 })
