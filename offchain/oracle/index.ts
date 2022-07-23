@@ -61,6 +61,7 @@ if (shellArgs.length < 1) {
             try {
                 let account = getAccount(web3, "user");
                 let loaded = loadCompiledSols(["SplitMerge"]);
+                console.log(loaded)
                 let contract = await deployContract(web3!, account, loaded.contracts["SplitMerge"]["SplitMergeFactory"].abi, loaded.contracts["SplitMerge"]["SplitMergeFactory"].evm.bytecode.object);
                 console.log("user app contract address: " + contract.options.address);
             } catch (error) {
