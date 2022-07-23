@@ -112,12 +112,12 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
 
     /*
     // Check if tokenID is owned by msg.sender and then append to the voting list
-    function intiateVoting(uint256 tokenId) {
+    function intiateVoting(uint256 tokenId) public{
         ownerOf()
         idToInfo[tokenId].voted = true;
     }
 
-    function getGradingData(uint256 tokenId, uint grade) {
+    function getGradingData(uint256 tokenId, uint grade) public{
         
     }
 
