@@ -121,12 +121,12 @@ function getIndex(bytes32[] childs, bytes32 _path) pure internal returns (uint25
 
     // Interaction with voting contract
     Voting voting_contract;
-    function requestVoting(uint256 tokenId, address voting_contract_addr){
+    function requestVoting(uint256 tokenId, address voting_contract_addr) public {
         voting_contract = Voting(voting_contract_addr);
         voting_contract.meat_enqueue(tokenId);
     }
     
-    function getGradingData(uint256 tokenId, uint grade) {
+    function getGradingData(uint256 tokenId, uint grade) public {
         idToInfo[tokenId].grade = grade;
     }
 
