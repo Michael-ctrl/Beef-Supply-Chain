@@ -2,7 +2,7 @@
 .vscode/
 **/build/*
 /ui/**/build/*
-json/*
+json/*.json
 
 ######## Node Template ########
 # Logs
