@@ -60,6 +60,9 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         // Grant the contract deployer the default admin role
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
+
+        // make meat NFTs start at an index of 1
+        _tokenIds.increment();
     }
 
     function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
@@ -97,12 +100,14 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
 
     // Interaction with voting contract
     Voting voting_contract;
-    function requestVoting(uint256 tokenId, address voting_contract_addr){
+    function requestVoting(uint256 tokenId, address voting_contract_addr) public {
+        // person who can start voting needs to own the token
+        require(ownerOf(tokenId) == msg.sender, "Meat voting can only be request by the NFT owner");
         voting_contract = Voting(voting_contract_addr);
         voting_contract.meat_enqueue(tokenId);
     }
     
-    function getGradingData(uint256 tokenId, uint grade) {
+    function getGradingData(uint256 tokenId, uint grade) public {
         idToInfo[tokenId].grade = grade;
     }
 /*

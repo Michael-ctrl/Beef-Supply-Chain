@@ -37,7 +37,7 @@ contract Voting{
     }
 
     // update the external function address
-    function get_meatnft(address addr) public {
+    function get_nftContractAddress(address addr) public {
         meatnft_contract = SupplyChain(addr);
     } 
 
@@ -61,7 +61,7 @@ contract Voting{
 
     // @notice manager force contract to enter voting phase
     // @return true if currectly transfered to voting phase
-    function startVoting() public restricted votingCreate returns (bool){
+    function startVoting() public votingCreate returns (bool){
         require(queue_last >= queue_first); // check if meat queue is empty 
         if(state == voteState.create){
             current_meat = queue[queue_first];
@@ -74,6 +74,7 @@ contract Voting{
 
     /// @return validVote Is the vote valid? or trigger final result if 10 regulator has voted or block limit exceed
     function doVote(uint grade, uint256 validation_key, uint256 meat) public votingOpen returns (bool validVote){
+        require(grade <= 9);
         require(queue[queue_first] == meat); // check is meat id matches currently voted one
         validVote = false;                              //Is the vote valid?
         if(block.number > startingBlock + blocklimit){
@@ -84,7 +85,7 @@ contract Voting{
         if (validation_key == 1)  { //regulator has the key? (used 1 as the key for simplicity)
             if(votes[msg.sender].grade == 0){ // check if the sender has voted before
                 numVotes = numVotes+1;
-                grade_total = grade + grade;
+                grade_total = grade_total + grade;
             }else{ // update the vote if the voter has voted before
                 grade_total = grade_total + grade - votes[msg.sender].grade;
             }
@@ -103,6 +104,9 @@ contract Voting{
     function finalResult() private{ 
         result_grade = grade_total / numVotes;
         meatnft_contract.getGradingData(current_meat, result_grade);
+        numVotes = 0;
+        startingBlock = block.number;
+        grade_total = 0;
         dequeue();
         state = voteState.create; //Voting state transfered to create
         if(queue_last >= queue_first){ // change the state to 
