@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.12;
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract MeatNFT is ERC721URIStorage, AccessControl {
     using Counters for Counters.Counter;
@@ -65,8 +66,9 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         _tokenIds.increment();
     }
 
-    function createMeat(string memory tokenURI, string memory _description, string memory _location, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
+    function createMeat(string memory _description, string memory _location, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 newItemId = _tokenIds.current();
+        string memory tokenURI = string(abi.encodePacked(Strings.toString(newItemId)," ",Strings.toHexString(address(this))));
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
 
@@ -83,8 +85,6 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         sourcesHistory[_tokenIds.current()] = new uint256[](0);
 
         _tokenIds.increment();
-
-        
 
         return newItemId;
     }
