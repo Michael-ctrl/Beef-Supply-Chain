@@ -20,42 +20,32 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         bool voted;
     }
 
+    // Struct for getting required outputs of splitMerge
+    struct OutputMeat {
+        string description;
+        string location;
+        uint quantity;
+        uint weight;
+    }
+
     // Tree data structure to hold the history of a tokens ownership
     mapping (uint256 => address[]) ownersHistory;
     mapping (uint256 => uint256[]) sourcesHistory;
 
     struct viewHistory {
         uint256 tokenId;
-        address[] owners;
         uint256 child;
-    }
-
-    // dfs
-    // call with history empty
-    function traverseHistory(uint256 _tokenId, uint index, uint256 _child, viewHistory[] memory history) private returns (viewHistory[] memory){
-        
-        history[index] = (viewHistory({
-            tokenId: _tokenId, 
-            owners: ownersHistory[_tokenId],
-            child: _child
-        }));
-        index++;
-        for (uint i=0; i<sourcesHistory[_tokenId].length; i++) {
-            history = traverseHistory(sourcesHistory[_tokenId][i], index, _tokenId, history);
-            index++;
-        }
-        return history;
-    }
-
-    function getHistory(uint256 _tokenId, uint historySize) public returns (viewHistory[] memory) {
-        return traverseHistory(_tokenId, 0, 0, new viewHistory[](historySize));
+        address[] owners;
     }
 
     mapping (uint256 => MeatInfo) public idToInfo;
 
+    event Mint(string tokenURI, address to);
+
     bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE"); // A role that allows individuals to mint NFTs
     bytes32 private constant BURNER_ROLE = keccak256("BURNER_ROLE"); // A role that allows individuals to burn NFTs
     bytes32 private constant VOTER_ROLE = keccak256("VOTER_ROLE"); // A role that allows individuals to vote on grading
+    bytes32 private constant PROCESSOR_ROLE = keccak256("PROCESSOR_ROLE"); // A role that allows individuals to process NFT's into new NFT's
 
     constructor() ERC721("MeatNFT", "BFT") {
         // Grant the contract deployer the default admin role
@@ -66,11 +56,18 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         _tokenIds.increment();
     }
 
-    function createMeat(string memory _description, string memory _location, uint _weight) public onlyRole(MINTER_ROLE) returns (uint256) {
+    function createMeat(
+        string memory _description, 
+        string memory _location, 
+        uint _weight
+    ) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         string memory tokenURI = string(abi.encodePacked(Strings.toString(newItemId)," ",Strings.toHexString(address(this))));
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
+
+
+        emit Mint(tokenURI, msg.sender);
 
         MeatInfo memory m;
         m.description = _description;
@@ -101,6 +98,39 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         _grantRole(VOTER_ROLE, account);
     }
 
+    function makeProcessor(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(PROCESSOR_ROLE, account);
+    }
+
+    // call with history empty
+    function traverseHistory(
+        uint256 _tokenId, 
+        uint index, 
+        uint256 _child, 
+        viewHistory[] memory history
+    ) private returns (viewHistory[] memory) {
+        
+        history[index] = (viewHistory({
+            tokenId: _tokenId, 
+            owners: ownersHistory[_tokenId],
+            child: _child
+        }));
+        index++;
+        for (uint i=0; i<sourcesHistory[_tokenId].length; i++) {
+            history = traverseHistory(sourcesHistory[_tokenId][i], index, _tokenId, history);
+            index++;
+        }
+        return history;
+    }
+
+    function getHistory(uint256 _tokenId, uint historySize) public returns (viewHistory[] memory) {
+        return traverseHistory(_tokenId, 0, 0, new viewHistory[](historySize));
+    }
+
+    function getMeatInfo(uint256 tokenId) public view returns (MeatInfo memory, address[] memory) {
+        return (idToInfo[tokenId], ownersHistory[tokenId]);
+    }
+
     // Interaction with voting contract
     Voting voting_contract;
     function requestVoting(uint256 tokenId, address voting_contract_addr) public {
@@ -116,27 +146,50 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         idToInfo[tokenId].grade = grade;
         idToInfo[tokenId].voted = true;
     }
-/*
-    function splitMerge(uint256[] inputs, ) {
-        _mint
-    }*/
 
-    /*
-    // Check if tokenID is owned by msg.sender and then append to the voting list
-    function intiateVoting(uint256 tokenId) public{
-        ownerOf()
-        idToInfo[tokenId].voted = true;
+    // Creates 'quantity' tokens for each outputMeat, disables the input tokens 
+    // and records the transfomation in tracking history.
+    //
+    // Input for 'outputs' in form of [["descr", "loc", 1, 1],[...]]
+    function splitMerge(
+        uint256[] memory inputs, 
+        OutputMeat[] calldata outputs
+    ) public onlyRole(PROCESSOR_ROLE) returns(uint256[] memory) {
+        for (uint i=0; i < inputs.length; i++) {
+            require(ownerOf(inputs[i]) == msg.sender, "One of the tokens does not belong to the caller");
+        }
+        for (uint i=0; i < inputs.length; i++) {
+            _burn(inputs[i]);
+        }
+        uint256[] memory tokens = new uint256[](0);
+        uint a = 0;
+        for (uint i = 0; i < outputs.length; i++) {
+            for (uint j = 0; j < outputs[i].quantity; j++) {
+                uint256 token = (createMeat(outputs[i].description, outputs[i].location, outputs[i].weight));
+                sourcesHistory[token] = inputs;
+                ownersHistory[token] = [msg.sender];
+                tokens[a] = token;
+                a++;
+            }
+        }
+        return tokens;
     }
 
-    function getGradingData(uint256 tokenId, uint grade) public{
-        
+    // Burns a token but keeps the information associated with it
+    function disableToken(uint256 tokenId) public onlyRole(BURNER_ROLE) {
+        _burn(tokenId);
     }
 
-    // 
-    
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        if (to != address(0) && from != address(0)) {
+            ownersHistory[tokenId].push(to);
+        }
+    }
 
-    // some edit data functions
-    */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
