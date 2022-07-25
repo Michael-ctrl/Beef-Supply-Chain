@@ -14,8 +14,12 @@ Blockchain Management of Beef Supply Chain
   
 ### Database (Cooper)
   * Receive new `tokenURI` from the reverse oracle
-  * Receive images linked to `tokenId` from business UI
+  * Receive images linked to `tokenURI` from regulator UI
   * Serve images to regulator UI
+  * Stores: 
+   * Just the parent cow
+   * MSA Grading Info: https://www.mla.com.au/marketing-beef-and-lamb/meat-standards-australia/msa-beef/grading/
+   * Images
   
 ### Tokenisation contract (Michael ERC-721, Marcus Voting)
   * self-destruct(only from the owner of the token)
