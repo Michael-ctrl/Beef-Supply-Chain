@@ -17,9 +17,9 @@ Blockchain Management of Beef Supply Chain
   * Receive images linked to `tokenURI` from regulator UI
   * Serve images to regulator UI
   * Stores: 
-   * Just the parent cow
-   * MSA Grading Info: https://www.mla.com.au/marketing-beef-and-lamb/meat-standards-australia/msa-beef/grading/
-   * Images
+    * Just the parent cow
+    * MSA Grading Info: https://www.mla.com.au/marketing-beef-and-lamb/meat-standards-australia/msa-beef/grading/
+    * Images
   
 ### Tokenisation contract (Michael ERC-721, Marcus Voting)
   * self-destruct(only from the owner of the token)
@@ -79,4 +79,5 @@ Grade: 7
   * Upload data related to tokens
 
 ### Regulator UI (Marcus)
-  *  Vote the meet by the given token ID
+  * Vote the meat by the given token ID
+  * Upload images and other MSA data
