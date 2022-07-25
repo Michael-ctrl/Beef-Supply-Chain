@@ -35,7 +35,7 @@ Blockchain Management of Beef Supply Chain
 ### Minting_contract (Zac)
  * create the tokenisation contract() return address[] contract
 
-### Consumer UI (Marcus)
+### Consumer UI (Zac)
   *  Trace back supply chain by the given contract ID
   * Example output (not final):
   ```
