@@ -98,12 +98,14 @@ if (shellArgs.length < 1) {
             }
 
             // Listen for minting events (as emitted by the SC)
-            contract.events.allEvents()
+            contract.events.Mint()
                 .on("connected", function(subscriptionId: any) {
                     console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId); // just log for now
                 })
                 .on("data", function(event: any) {
                     console.log(event);
+                    let values = event.returnValues;
+                    // Store tokenId with URI, minter address
                 })
                 .on('error', function (error: any, receipt: any) {
                     console.log(error);
