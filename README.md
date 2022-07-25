@@ -14,8 +14,12 @@ Blockchain Management of Beef Supply Chain
   
 ### Database (Cooper)
   * Receive new `tokenURI` from the reverse oracle
-  * Receive images linked to `tokenId` from business UI
+  * Receive images linked to `tokenURI` from regulator UI
   * Serve images to regulator UI
+  * Stores: 
+    * Just the parent cow
+    * MSA Grading Info: https://www.mla.com.au/marketing-beef-and-lamb/meat-standards-australia/msa-beef/grading/
+    * Images
   
 ### Tokenisation contract (Michael ERC-721, Marcus Voting)
   * self-destruct(only from the owner of the token)
@@ -31,7 +35,7 @@ Blockchain Management of Beef Supply Chain
 ### Minting_contract (Zac)
  * create the tokenisation contract() return address[] contract
 
-### Consumer UI (Marcus)
+### Consumer UI (Zac)
   *  Trace back supply chain by the given contract ID
   * Example output (not final):
   ```
@@ -75,4 +79,5 @@ Grade: 7
   * Upload data related to tokens
 
 ### Regulator UI (Marcus)
-  *  Vote the meet by the given token ID
+  * Vote the meat by the given token ID
+  * Upload images and other MSA data
