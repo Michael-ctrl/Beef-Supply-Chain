@@ -1,0 +1,33 @@
+{
+    "name": "blockchainbeef",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+      "bui": "tsc && node build/ui/business/index.js setup -k 0x0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
+      "chain": "ganache --wallet.seed test",
+      "deploy": "tsc && node build/offchain/oracle/index.js deploy MeatNFT",
+      "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308"
+    },
+    "keywords": [],
+    "contributors": [
+        { "name": "Cooper van Wijck" },
+        { "name": "Micheal Liang" },
+        { "name": "Mukuan Hsu" },
+        { "name": "Zachary Lim" }
+
+    ],
+    "license": "ISC",
+    "devDependencies": {
+      "@types/node": "^15.12.2",
+      "typescript": "^4.3.2"
+    },
+    "dependencies": {
+      "@openzeppelin/contracts": "^4.7.1",
+      "axios": "^0.21.1",
+      "chalk": "^4.1.2",
+      "solc": "^0.8.5",
+      "vorpal": "^1.12.0",
+      "vorpal-as-default": "^0.0.2",
+      "web3": "^1.3.6"
+    }
+  }
