@@ -75,6 +75,25 @@ vorpal
         }
     });
 
+vorpal
+    .command('mint', 'Mint a token')
+    .option('-d, --description <description>', 'Description of the item', null, 'Default Meat Description')
+    .option('-l, --location <location>', 'Location of the item', null, 'Default Meat Location')
+    .option('-w, --weight <weight>', 'Weight of the item', null, 0)
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+        } else {
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
+            }
+        }
+        callback();
+    });
+
 // Transact Ether
 vorpal
     .command('send <amount> <address>', 'Send ether to an address')
