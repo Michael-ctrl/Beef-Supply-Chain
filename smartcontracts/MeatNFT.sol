@@ -3,11 +3,11 @@ pragma solidity ^0.8.12;
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract MeatNFT is ERC721URIStorage, AccessControl {
+contract MeatNFT is ERC721URIStorage, AccessControlEnumerable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -137,7 +137,7 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         // person who can start voting needs to own the token
         require(ownerOf(tokenId) == msg.sender, "Meat voting can only be request by the NFT owner");
         voting_contract = Voting(voting_contract_addr);
-        uint quorum = 5;
+        uint quorum = getRoleMemberCount(VOTER_ROLE)/2;
         voting_contract.meat_enqueue(tokenId, quorum);
         idToInfo[tokenId].voted = true;
     }
@@ -190,7 +190,7 @@ contract MeatNFT is ERC721URIStorage, AccessControl {
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControlEnumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

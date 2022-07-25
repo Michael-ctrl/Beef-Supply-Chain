@@ -80,7 +80,7 @@ contract Voting{
         validVote = false;                              //Is the vote valid?
         if(block.number > startingBlock + blocklimit){
             finalResult();
-            state = voteState.end;   
+            //state = voteState.end;   
             return validVote; 
         } 
         if (validation_key == 1)  { //regulator has the key? (used 1 as the key for simplicity)
