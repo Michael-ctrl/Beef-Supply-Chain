@@ -6,6 +6,10 @@ import { deployContract } from './deploy'; // deployment function (for testing)
 import { Address } from 'cluster'; // Address type
 let fs = require('fs');
 
+// Usage: 
+//tsc && node build/offchain/oracle/index.js deploy MeatNFT
+//tsc && node build/offchain/oracle/index.js listen MeatNFT <address>
+
 // Read the blockchain provider from the providers.json file and return a Web3 provider
 function initializeProvider(): WebsocketProvider {
     try {
