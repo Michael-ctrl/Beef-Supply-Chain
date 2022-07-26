@@ -103,7 +103,7 @@ vorpal
 
                 //console.log(args.options);
 
-                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat(string memory, string memory, uint)', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
+                var receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
                 self.log(chalk.greenBright('Token minted ') + receipt.transactionHash);
             }
         }
@@ -169,7 +169,7 @@ vorpal.run = function (argv: any, options: any, done: any) {
 function setupcontract (instance: any, address: string) {
     //console.log(instance, args);
     contract = initialiseContract(web3, address);
-    instance.log(chalk.greenBright('Connected to contract ') + address);
+    instance.log(chalk.greenBright('Loaded contract ABI for ') + address);
 }
 
 function setupwallet (instance: any, key: string) {
