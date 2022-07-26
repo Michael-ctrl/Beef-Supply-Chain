@@ -4,7 +4,7 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
-import { methodSend } from './transact'
+import { methodSend } from '../lib/transact'
 
 var vorpal = require('vorpal')();
 

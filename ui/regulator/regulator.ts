@@ -6,7 +6,7 @@ import { Contract } from 'web3-eth-contract'; // contract type
 import { WebsocketProvider, Account } from 'web3-core';
 import chalk from 'chalk';
 let fs = require('fs');
-import { loadCompiledSols } from './load'; // compiling and loading ABI function
+import { loadCompiledSols } from '../lib/load'; // compiling and loading ABI function
 
 export function initialiseContract(web3: Web3, contractAddress: string): Contract {
     try {
