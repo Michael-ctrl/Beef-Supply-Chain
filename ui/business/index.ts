@@ -75,11 +75,12 @@ vorpal
         }
     });
 
+// Mint token
 vorpal
     .command('mint', 'Mint a token')
-    .option('-d, --description <description>', 'Description of the item', null, 'Default Meat Description')
-    .option('-l, --location <location>', 'Location of the item', null, 'Default Meat Location')
-    .option('-w, --weight <weight>', 'Weight of the item', null, 0)
+    .option('-d, --description <description>', 'Description of the item')
+    .option('-l, --location <location>', 'Location of the item')
+    .option('-w, --weight <weight>', 'Weight of the item')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
         if (!account) {
@@ -88,6 +89,19 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
+                // Setup defaults
+                if (!args.options.description) {
+                    args.options.description = 'Default Meat Description';
+                }
+                if (!args.options.location) {
+                    args.options.location = 'Default Meat Location';
+                }
+                if (!args.options.weight) {
+                    args.options.weight = 0;
+                }
+
+                //console.log(args.options);
+
                 methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
             }
         }
@@ -153,7 +167,7 @@ vorpal.run = function (argv: any, options: any, done: any) {
 function setupcontract (instance: any, args: any) {
     //console.log(instance, args);
     contract = initialiseContract(web3, args.options.contract);
-    instance.log(chalk.greenBright('Connected to contract ') + args.options.contract);
+    instance.log(chalk.greenBright('Loaded contract ') + args.options.contract);
 }
 
 function setupwallet (instance: any, args: any) {
