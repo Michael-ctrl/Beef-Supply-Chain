@@ -11,6 +11,7 @@ var vorpal = require('vorpal')();
 let web3: Web3 = new Web3(initialiseProvider());
 let account: Account;
 let contract: Contract;
+let voting: Contract;
 let tokens = [];
 
 // Easy Setup from CLI
@@ -103,8 +104,37 @@ vorpal
 
                 //console.log(args.options);
 
-                var receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
                 self.log(chalk.greenBright('Token minted ') + receipt.transactionHash);
+            }
+        }
+        callback();
+    });
+
+// Request voting
+vorpal
+    .command('request <tokenID>', 'Request voting')
+    .types({string: ['_']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+        } else {
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                if (!voting) {
+                    self.log(chalk.redBright('Error: ') + 'Please connect to a voting contract with ' + chalk.gray('voting <contractAddress>'));
+                } else {
+                    // Check if token exists and is owned by user
+                    // Update tokens list
+                    tokens = await getTokens(web3, contract, account);
+                    if (tokens.find(args.tokenID)) {
+                        // Request voting
+                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID]);
+                        self.log(chalk.greenBright('Request sent ') + receipt.transactionHash);
+                    }
+                }
             }
         }
         callback();
@@ -176,6 +206,11 @@ function setupwallet (instance: any, key: string) {
     const self = instance;
     account = addWallet(web3, key);
     instance.log(chalk.greenBright('Wallet added ') + account.address);
+}
+
+function setupvoting (instance: any, address: string) {
+    voting = initialiseContract(web3, address);
+    instance.log(chalk.greenBright('Loaded contract ABI for ') + address);
 }
 
 vorpal
