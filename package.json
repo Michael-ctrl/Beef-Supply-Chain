@@ -4,6 +4,7 @@
     "description": "",
     "scripts": {
         "bui": "tsc && node build/ui/business/index.js setup -k 0x0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
+        "regulator": "tsc && node build/ui/regulator/index.js setup -k 0xd4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
         "chain": "ganache --wallet.seed test",
         "deploy": "tsc && node build/offchain/oracle/index.js deploy MeatNFT",
         "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308"
@@ -32,7 +33,11 @@
         "@openzeppelin/contracts": "^4.7.1",
         "axios": "^0.21.1",
         "chalk": "^4.1.2",
+<<<<<<< HEAD
         "firebase": "^9.9.1",
+=======
+        "ganache": "^7.3.2",
+>>>>>>> f740bf734497754ca0bd28d91283ee9c95ba5e02
         "solc": "^0.8.5",
         "vorpal": "^1.12.0",
         "vorpal-as-default": "^0.0.2",
