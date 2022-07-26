@@ -48,6 +48,15 @@ vorpal
         callback();
     });
 
+// Voting setup
+vorpal
+    .command('setupvoting <contractAddress>', 'Connect to the voting contract')
+    .types({string: ['_']})
+    .action(function (this: any, args: any, callback: any) {
+        setupvoting(this, args.contractAddress);
+        callback();
+    });
+
 // List Tokens in Wallet
 vorpal
     .command('check', 'List tokens in your wallet')
@@ -152,7 +161,7 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                let receipt = await methodSend(web3, account, contract.options.jsonInterface, '_transfer', contract.options.address, [account.address, args.to, args.tokenID]);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'Transfer', contract.options.address, [account.address, args.to, args.tokenID]);
                 self.log(chalk.greenBright('Token sent ') + receipt.transactionHash);
             }
         }
@@ -233,6 +242,6 @@ function setupvoting (instance: any, address: string) {
 }
 
 vorpal
-    .delimiter('business > ')
+    .delimiter(chalk.blue('business') + ' > ')
     .run(process.argv)
     .show();
