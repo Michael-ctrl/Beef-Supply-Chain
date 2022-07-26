@@ -25,7 +25,7 @@ export async function methodSend(web3: Web3, account: Account, abi: any, methodN
     await web3.eth.getBalance(account.address).then((account_balance) => {
         // console.log("Gas in wallet: " + account_balance);
     }).catch((err) => {
-
+        console.log(err)
     });
 
     // console.log("sending...");
