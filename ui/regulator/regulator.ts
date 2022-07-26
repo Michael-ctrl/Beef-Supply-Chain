@@ -10,9 +10,9 @@ import { loadCompiledSols } from '../lib/load'; // compiling and loading ABI fun
 
 export function initialiseContract(web3: Web3, contractAddress: string): Contract {
     try {
-        let loaded = loadCompiledSols(["MeatNFT"]);
+        let loaded = loadCompiledSols(["Voting"]);
         //console.log(loaded);
-        return new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, contractAddress);
+        return new web3.eth.Contract(loaded.contracts["Voting"]["Voting"].abi, contractAddress);
     } catch (error) {
         throw chalk.redBright("Cannot read contract " + error);
     }
