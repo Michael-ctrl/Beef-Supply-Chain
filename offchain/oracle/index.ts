@@ -4,11 +4,31 @@ import { Contract } from 'web3-eth-contract'; // contract type
 import { loadCompiledSols } from './load'; // compiling and loading ABI function
 import { deployContract } from './deploy'; // deployment function (for testing)
 import { Address } from 'cluster'; // Address type
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+
 let fs = require('fs');
 
 // Usage: 
 //tsc && node build/offchain/oracle/index.js deploy MeatNFT
 //tsc && node build/offchain/oracle/index.js listen MeatNFT <address>
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDE4B921jYQ2nsOeRk5qZwkKzkowc-u8vI",
+    authDomain: "meatnft-1385e.firebaseapp.com",
+    projectId: "meatnft-1385e",
+    storageBucket: "meatnft-1385e.appspot.com",
+    messagingSenderId: "242420508999",
+    appId: "1:242420508999:web:0d4c4af6c0306d4b50c462"
+  };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+
 
 // Read the blockchain provider from the providers.json file and return a Web3 provider
 function initializeProvider(): WebsocketProvider {
@@ -102,10 +122,28 @@ if (shellArgs.length < 1) {
                 .on("connected", function(subscriptionId: any) {
                     console.log("Listening for event 'Mint', subscriptionId: " + subscriptionId); // just log for now
                 })
-                .on("data", function(event: any) {
+                .on("data", async function(event: any) {
                     console.log(event);
                     let values = event.returnValues;
                     // Store tokenId with URI, minter address
+                    await setDoc(doc(db, "meatNFTs", values.tokenURI), {
+                        og_cow: "",
+                        msa_grading: {
+                            body_number: 0,
+                            lot_number: 0,
+                            carcase_weight: 0,
+                            sex: "",
+                            tropical_breed_content: "",
+                            hanging_method: "",
+                            hormonal_growth_promotants: "",
+                            ossification: "",
+                            marbling: "",
+                            rib_fat: "",
+                            ph: 0,
+                            temperature: 0
+                        },
+                        image: ''
+                      });
                 })
                 .on('error', function (error: any, receipt: any) {
                     console.log(error);

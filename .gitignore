@@ -1,8 +1,7 @@
 # Our Bits
 .vscode/
-**/build/*
-/ui/**/build/*
-json/*.json
+build/*
+json/*
 
 ######## Node Template ########
 # Logs

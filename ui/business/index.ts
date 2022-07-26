@@ -4,7 +4,7 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
-import { methodSend } from './transact'
+import { methodSend } from '../lib/transact'
 
 var vorpal = require('vorpal')();
 
@@ -75,12 +75,13 @@ vorpal
         }
     });
 
+
 // Mint a new token
 vorpal
     .command('mint', 'Mint a token')
-    .option('-d, --description <description>', 'Description of the item', null, 'Default Meat Description')
-    .option('-l, --location <location>', 'Location of the item', null, 'Default Meat Location')
-    .option('-w, --weight <weight>', 'Weight of the item', null, 0)
+    .option('-d, --description <description>', 'Description of the item')
+    .option('-l, --location <location>', 'Location of the item')
+    .option('-w, --weight <weight>', 'Weight of the item')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
         if (!account) {
@@ -89,6 +90,19 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
+                // Setup defaults
+                if (!args.options.description) {
+                    args.options.description = 'Default Meat Description';
+                }
+                if (!args.options.location) {
+                    args.options.location = 'Default Meat Location';
+                }
+                if (!args.options.weight) {
+                    args.options.weight = 0;
+                }
+
+                //console.log(args.options);
+
                 let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat(string memory, string memory, uint)', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
                 self.log(chalk.greenBright('Token minted ') + receipt.transactionHash);
             }
