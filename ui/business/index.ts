@@ -4,7 +4,7 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
-import { methodSend } from '../lib/transact'
+import { methodSend, sendEther } from '../lib/transact'
 
 var vorpal = require('vorpal')();
 
@@ -75,7 +75,7 @@ vorpal
             } else {
                 // Get list of tokens
                 tokens = await getTokens(web3, contract, account);
-                if (tokens) {
+                if (tokens.length > 1) {
                     self.log('Tokens:\n' + tokens.join('\n'));
                 } else {
                     self.log(chalk.redBright('Error: ') + 'No tokens found in your wallet');
@@ -180,7 +180,8 @@ vorpal
             callback();
         } else {
             //send eth
-            self.log(chalk.greenBright('Transaction sent '));
+            let receipt = await sendEther(web3, account.address, args.address, web3.utils.toWei(args.amount as string, 'ether'));
+            self.log(chalk.greenBright('Transaction sent ') + receipt.transactionHash);
             callback();
         }
     });
