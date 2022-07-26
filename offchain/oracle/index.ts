@@ -142,7 +142,7 @@ if (shellArgs.length < 1) {
                             ph: 0,
                             temperature: 0
                         },
-                        image: null
+                        image: ''
                       });
                 })
                 .on('error', function (error: any, receipt: any) {
