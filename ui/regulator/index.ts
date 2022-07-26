@@ -42,13 +42,29 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                methodSend(web3, account, contract.options.jsonInterface, 'doVote', contract.options.address, [args.options.grade, args.options.key, args.options.tokenid]);
+                await methodSend(web3, account, contract.options.jsonInterface, 'doVote', contract.options.address, [args.options.grade,args.options.key,args.options.tokenid]);
             }
         }
         callback();
     });
 
-
+// n_vote
+vorpal
+.command('num_vote', 'Number of vote')
+.action(async function (this: any, args: any, callback: any) {
+    const self = this;
+    if (!account) {
+        self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+    } else {
+        if (!contract) {
+            self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+        } else {
+            let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'numVotes', contract.options.address, []);
+            console.log(receipt);
+        }
+    }
+    callback();
+});
 
 // Get contract ABI
 vorpal

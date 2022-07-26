@@ -29,7 +29,7 @@ export async function methodSend(web3: Web3, account: Account, abi: any, methodN
     });
 
     // console.log("sending...");
-    return a_contract.methods[methodName](...args).send({
+    return await a_contract.methods[methodName](...args).send({
         from: account.address,
         gasPrice: gasPrice,
         gas: Helper.gasPay(await a_contract.methods[methodName](...args).estimateGas({ from: account.address })),

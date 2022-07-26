@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.10;
 
 
 /// @title Contract to agree on the lunch venue
@@ -14,7 +14,7 @@ contract Voting{
     uint public numVotes = 0;
     uint grade_total = 0;
     address public manager;                     //Manager
-    SupplyChain meatnft_contract;
+    MeatNFT meatnft_contract;
     //mapping for queue
     mapping(uint256 => uint256) public queue;
     uint256 queue_first = 1;
@@ -35,10 +35,10 @@ contract Voting{
         manager = msg.sender; //Set contract creator as manager 
         startingBlock = block.number;
     }
-
+    
     // update the external function address
     function get_nftContractAddress(address addr) public {
-        meatnft_contract = SupplyChain(addr);
+        meatnft_contract = MeatNFT(addr);
     } 
 
     //  function for meat grade enqueue
@@ -141,10 +141,8 @@ contract Voting{
         require(state == voteState.create, "Currently not in create mode"); 
         _;
     } 
-
-
 }
 
-contract SupplyChain{
+contract MeatNFT{
     function getGradingData(uint256 tokenId, uint grade)public {}
 }

@@ -75,7 +75,7 @@ if (shellArgs.length < 1) {
             try {
                 let account = getAccount(web3, "user");
                 let loaded = loadCompiledSols(["Voting"]);
-                //console.log(loaded)
+                console.log(loaded)
                 let contract = await deployContract(web3!, account, loaded.contracts["Voting"]["Voting"].abi, loaded.contracts["Voting"]["Voting"].evm.bytecode.object);
                 console.log("user app contract address: " + contract.options.address);
             } catch (error) {
