@@ -23,8 +23,8 @@ vorpal
         string: ['k', 'key', 'c', 'contract']
     })
     .action(function (this:any, args: any, callback: any) {
-        setupcontract(this, args);
-        setupwallet(this, args);
+        setupcontract(this, args.options.contract);
+        setupwallet(this, args.options.key);
         callback();
     });
 
@@ -34,7 +34,7 @@ vorpal
     .command('setupcontract <contractAddress>', 'Connect to the contract')
     .types({string: ['_']})
     .action(function (this:any, args: any, callback: any) {
-        setupcontract(this, args);
+        setupcontract(this, args.contractAddress);
         callback();
     });
 
@@ -43,7 +43,7 @@ vorpal
     .command('setupwallet <privateKey>', 'Setup the business wallet')
     .types({string: ['_']})
     .action(function (this: any, args: any, callback: any) {
-        setupwallet(this, args);
+        setupwallet(this, args.privateKey);
         callback();
     });
 
@@ -75,6 +75,7 @@ vorpal
         }
     });
 
+// Mint a new token
 vorpal
     .command('mint', 'Mint a token')
     .option('-d, --description <description>', 'Description of the item', null, 'Default Meat Description')
@@ -88,7 +89,8 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                methodSend(web3, account, contract.options.jsonInterface, 'createMeat', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'createMeat(string memory, string memory, uint)', contract.options.address, [args.options.description, args.options.location, args.options.weight]);
+                self.log(chalk.greenBright('Token minted ') + receipt.transactionHash);
             }
         }
         callback();
@@ -150,25 +152,15 @@ vorpal.run = function (argv: any, options: any, done: any) {
 };
 
 // Helper functions
-function setupcontract (instance: any, args: any) {
+function setupcontract (instance: any, address: string) {
     //console.log(instance, args);
-    contract = initialiseContract(web3, args.options.contract);
-    instance.log(chalk.greenBright('Connected to contract ') + args.options.contract);
+    contract = initialiseContract(web3, address);
+    instance.log(chalk.greenBright('Connected to contract ') + address);
 }
 
-function setupwallet (instance: any, args: any) {
+function setupwallet (instance: any, key: string) {
     const self = instance;
-    if (!args.options.key) {
-        return instance.prompt({
-            type: 'input',
-            name: 'privateKey',
-            message: 'Enter your private key: ',
-        }, function(result: any) {
-            account = addWallet(web3, result.privateKey);
-        })
-    } else {
-        account = addWallet(web3, args.options.key);
-    }
+    account = addWallet(web3, key);
     instance.log(chalk.greenBright('Wallet added ') + account.address);
 }
 
