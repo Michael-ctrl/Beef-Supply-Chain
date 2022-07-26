@@ -59,7 +59,7 @@ vorpal
             callback();
         } else {
             // Get balance in ether
-            self.log('Balance: ' + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
+            self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
 
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
@@ -67,7 +67,7 @@ vorpal
                 // Get list of tokens
                 tokens = await getTokens(web3, contract, account);
                 if (tokens.length > 0) {
-                    self.log('Tokens: ' + tokens.join('\n'));
+                    self.log('Tokens:\n' + tokens.join('\n'));
                 } else {
                     self.log(chalk.redBright('Error: ') + 'No tokens found in your wallet');
                 }
@@ -140,9 +140,28 @@ vorpal
         callback();
     });
 
+// Send NFT
+vorpal
+    .command('send <tokenID> <to>', 'Send NFT')
+    .types({string: ['_']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+        } else {
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, '_transfer', contract.options.address, [account.address, args.to, args.tokenID]);
+                self.log(chalk.greenBright('Token sent ') + receipt.transactionHash);
+            }
+        }
+        callback();
+    });
+                
 // Transact Ether
 vorpal
-    .command('send <amount> <address>', 'Send ether to an address')
+    .command('sendeth <amount> <address>', 'Send ether to an address')
     .types({string: ['_']})
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
