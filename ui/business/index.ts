@@ -161,7 +161,7 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'transfer', contract.options.address, [account.address, args.to, args.tokenID]);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'transferFrom', contract.options.address, [account.address, args.to, args.tokenID as BigInt]);
                 self.log(chalk.greenBright('Token sent ') + receipt.transactionHash);
             }
         }
