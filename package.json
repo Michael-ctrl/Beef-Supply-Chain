@@ -6,7 +6,8 @@
         "bui": "tsc && node build/ui/business/index.js setup -k 0x0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
         "chain": "ganache --wallet.seed test",
         "deploy": "tsc && node build/offchain/oracle/index.js deploy MeatNFT",
-        "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308"
+        "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
+        "test_deploy": "tsc && node build/ui/manager/index.js"
     },
     "keywords": [],
     "contributors": [

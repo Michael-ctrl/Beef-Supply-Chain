@@ -6,6 +6,16 @@ import { Contract, DeployOptions } from 'web3-eth-contract';
 
 let fs = require('fs');
 
+export function initialiseContract(web3: Web3, contractAddress: string): Contract {
+    try {
+        let loaded = loadCompiledSols(["MeatNFT"]);
+        //console.log(loaded);
+        return new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, contractAddress);
+    } catch (error) {
+        throw chalk.redBright("Cannot read contract " + error);
+    }
+}
+
 export function initialiseProvider(): WebsocketProvider {
     try {
         let provider_data = fs.readFileSync('json/providers.json');
@@ -14,6 +24,14 @@ export function initialiseProvider(): WebsocketProvider {
         return new Web3.providers.WebsocketProvider(provider_link);
     } catch (error) {
         throw chalk.redBright("Cannot read provider: " + error);
+    }
+}
+
+export function addWallet(web3: Web3, privateKey: string): Account {
+    try {
+        return web3.eth.accounts.wallet.add(privateKey)
+    } catch (error) {
+        throw(chalk.redBright("Cannot add wallet: " + error));
     }
 }
 
