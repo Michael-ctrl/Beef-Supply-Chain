@@ -12,7 +12,7 @@ let web3: Web3 = new Web3(initialiseProvider());
 let account: Account;
 let contract: Contract;
 let voting: Contract;
-let tokens = [];
+let tokens: any = [];
 
 // Easy Setup from CLI
 vorpal
@@ -48,6 +48,15 @@ vorpal
         callback();
     });
 
+// Voting setup
+vorpal
+    .command('setupvoting <contractAddress>', 'Connect to the voting contract')
+    .types({string: ['_']})
+    .action(function (this: any, args: any, callback: any) {
+        setupvoting(this, args.contractAddress);
+        callback();
+    });
+
 // List Tokens in Wallet
 vorpal
     .command('check', 'List tokens in your wallet')
@@ -66,7 +75,7 @@ vorpal
             } else {
                 // Get list of tokens
                 tokens = await getTokens(web3, contract, account);
-                if (tokens.length > 0) {
+                if (tokens) {
                     self.log('Tokens:\n' + tokens.join('\n'));
                 } else {
                     self.log(chalk.redBright('Error: ') + 'No tokens found in your wallet');
@@ -152,7 +161,7 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                let receipt = await methodSend(web3, account, contract.options.jsonInterface, '_transfer', contract.options.address, [account.address, args.to, args.tokenID]);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'transferFrom', contract.options.address, [account.address, args.to, args.tokenID as BigInt]);
                 self.log(chalk.greenBright('Token sent ') + receipt.transactionHash);
             }
         }
@@ -233,6 +242,6 @@ function setupvoting (instance: any, address: string) {
 }
 
 vorpal
-    .delimiter('business > ')
+    .delimiter(chalk.blue('business') + ' > ')
     .run(process.argv)
     .show();
