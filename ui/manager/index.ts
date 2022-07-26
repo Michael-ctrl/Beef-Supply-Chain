@@ -61,6 +61,36 @@ vorpal
         self.log(chalk.greenBright('User is made a minter ') + receipt.transactionHash);
         callback();
     });
+
+vorpal
+    .command('makeburner <userAddress>', 'Make address a burner')
+    .types({string: [' ']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'makeBurner', contract.options.address, [args.userAddress]);
+        self.log(chalk.greenBright('User is made a burner ') + receipt.transactionHash);
+        callback();
+    });
+
+vorpal
+    .command('makevoter <userAddress>', 'Make address a voter')
+    .types({string: [' ']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'makeVoter', contract.options.address, [args.userAddress]);
+        self.log(chalk.greenBright('User is made a voter ') + receipt.transactionHash);
+        callback();
+    });
+    
+vorpal
+    .command('makeprocessor <userAddress>', 'Make address a processor')
+    .types({string: [' ']})
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'makeProcessor', contract.options.address, [args.userAddress]);
+        self.log(chalk.greenBright('User is made a processor ') + receipt.transactionHash);
+        callback();
+    });
     
     
 // helper functions
