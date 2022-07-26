@@ -30,7 +30,10 @@ vorpal
 
 // Voting
 vorpal
-    .command('Vote <tokenid> <grade>', 'Vote on meat')
+    .command('vote', 'Vote on meat')
+    .option('-g, --grade <grade>', 'Item grade', null, 0)
+    .option('-t, --tokenid <tokenid>', 'Token ID', null, 0)
+    .option('-k, --key <key>', 'Validation key', null, 0)
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
         if (!account) {
@@ -39,7 +42,7 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                methodSend(web3, account, contract.options.jsonInterface, 'doVote', contract.options.address, [args.options.grade, 1, args.options.grade]);
+                methodSend(web3, account, contract.options.jsonInterface, 'doVote', contract.options.address, [args.options.grade, args.options.key, args.options.tokenid]);
             }
         }
         callback();
