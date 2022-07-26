@@ -3,11 +3,12 @@ pragma solidity ^0.8.12;
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract MeatNFT is ERC721URIStorage, AccessControlEnumerable {
+contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -60,7 +61,7 @@ contract MeatNFT is ERC721URIStorage, AccessControlEnumerable {
         string memory _description, 
         string memory _location, 
         uint _weight
-    ) public onlyRole(MINTER_ROLE) returns (uint256) {
+    ) public returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         string memory tokenURI = string(abi.encodePacked(Strings.toString(newItemId)," ",Strings.toHexString(address(this))));
         _mint(msg.sender, newItemId);
@@ -190,8 +191,20 @@ contract MeatNFT is ERC721URIStorage, AccessControlEnumerable {
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControlEnumerable) returns (bool) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
+        return super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControlEnumerable, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
     }
 
 }
