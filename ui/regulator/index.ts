@@ -28,6 +28,24 @@ vorpal
         callback();
     });
 
+// Voting
+vorpal
+    .command('Vote <tokenid> <grade>', 'Vote on meat')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+        } else {
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                methodSend(web3, account, contract.options.jsonInterface, 'doVote', contract.options.address, [args.options.grade, 1, args.options.grade]);
+            }
+        }
+        callback();
+    });
+
+
 
 // Get contract ABI
 vorpal
@@ -40,7 +58,7 @@ vorpal
 
 // Wallet Setup
 vorpal
-    .command('setupwallet <privateKey>', 'Setup the business wallet')
+    .command('setupwallet <privateKey>', 'Setup the regulator wallet')
     .types({string: ['_']})
     .action(function (this: any, args: any, callback: any) {
         setupwallet(this, args);
@@ -119,10 +137,13 @@ function setupwallet (instance: any, args: any) {
 }
 
 function doUpload(instance: any, args: any){
-    console.log("proccessing upload");
+    console.log("Proccessing upload");
 }
 
+function doVote(){
+    console.log("Attempting to vote");
+}
 vorpal
-    .delimiter('business > ')
+    .delimiter('regulator > ')
     .run(process.argv)
     .show();

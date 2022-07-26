@@ -61,7 +61,7 @@ if (shellArgs.length < 1) {
             process.exit(1);
         }
 
-        if (shellArgs[1] == "MeatNFT") {
+        if (shellArgs[1] == "meatnft-voting") {
             try {
                 let account = getAccount(web3, "user");
                 let loaded = loadCompiledSols(["MeatNFT"]);
@@ -69,7 +69,17 @@ if (shellArgs.length < 1) {
                 let contract = await deployContract(web3!, account, loaded.contracts["MeatNFT"]["MeatNFT"].abi, loaded.contracts["MeatNFT"]["MeatNFT"].evm.bytecode.object);
                 console.log("user app contract address: " + contract.options.address);
             } catch (error) {
-                console.error("error deploying contract");
+                console.error("error deploying meat contract");
+                console.error(error);
+            }
+            try {
+                let account = getAccount(web3, "user");
+                let loaded = loadCompiledSols(["Voting"]);
+                //console.log(loaded)
+                let contract = await deployContract(web3!, account, loaded.contracts["Voting"]["Voting"].abi, loaded.contracts["Voting"]["Voting"].evm.bytecode.object);
+                console.log("user app contract address: " + contract.options.address);
+            } catch (error) {
+                console.error("error deploying voting contract");
                 console.error(error);
             }
         } else {
