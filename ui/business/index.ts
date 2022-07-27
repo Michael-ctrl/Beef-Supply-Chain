@@ -170,8 +170,13 @@ vorpal
             if (checkContract()) {
                 tokens = await getTokens(web3, contract, account); // update token list
                 let inputList: number[] = [];
-                interface Out { description: string, location: string, quantity: number, weight: number };
-                let outputList: Out[]
+                interface Out { 
+                    description: string;
+                    location: string;
+                    quantity: number;
+                    weight: number;
+                }
+                let outputList: Out[] = [];
                 return self.prompt({
                     type: 'checkbox',
                     name: 'tokens',
