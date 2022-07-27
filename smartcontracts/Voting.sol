@@ -75,7 +75,7 @@ contract Voting{
 
     /// @return validVote Is the vote valid? or trigger final result if 10 regulator has voted or block limit exceed
     function doVote(uint grade, uint256 validation_key, uint256 meat) public votingOpen returns (bool validVote){
-        require(grade <= 9);
+        require(grade <= 80 && grade >= 30);
         require(queue[queue_first] == meat); // check is meat id matches currently voted one
         validVote = false;                              //Is the vote valid?
         if(block.number > startingBlock + blocklimit){
