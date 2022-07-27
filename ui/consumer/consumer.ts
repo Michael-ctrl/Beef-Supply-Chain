@@ -7,6 +7,21 @@ import { WebsocketProvider, Account } from 'web3-core';
 import chalk from 'chalk';
 let fs = require('fs');
 import { loadCompiledSols } from '../lib/load'; // compiling and loading ABI function
+import { parse } from 'path';
+
+let historySize = 100;
+//let head: number;
+
+type ArrayIndexable = {
+    [tokenId: number]: number;
+}
+
+type TreeNode = {
+    tokenId: number;
+    child: number;
+    owners: string[];
+    sources: TreeNode[];
+}
 
 export function initialiseContract(web3: Web3, contractAddress: string): Contract {
     try {
@@ -45,14 +60,67 @@ export async function getBalance(web3: Web3, account: Account): Promise<string> 
     }
 }
 
-export async function getTokenInfo(web3: Web3, contract: Contract, account: Account, tokenId: number) {
-    // Get number of tokens
+export async function getTokenInfo(contract: Contract, tokenId: number) {
     let meatInfo: Object;
     try {
         meatInfo = await contract.methods.idToInfo(tokenId).call();
     } catch (error) {
         return [];
     }
-
     return meatInfo;
+}
+
+export async function getTokenOwners(contract: Contract, tokenId: number) {
+    let meatInfo: Object;
+    try {
+        meatInfo = await contract.methods.ownersHistory(tokenId).call();
+    } catch (error) {
+        return [];
+    }
+    return meatInfo;
+}
+
+export async function getTokenHistory(contract: Contract, tokenId: number) {
+    let meatHistory: TreeNode[];
+    try {
+        meatHistory = await contract.methods.getHistory(tokenId, historySize).call();
+    } catch (error) {
+        return [];
+    }
+    return parseHistory(meatHistory, tokenId);
+}
+
+export function parseHistory(history: TreeNode[], head: number) {
+    //Map tokenId to Array index
+    let idMap: ArrayIndexable;
+    const idMapping = history.reduce((acc: ArrayIndexable, token: TreeNode, i) => {
+        acc[token.tokenId] = i;
+        return acc;
+      }, {});
+
+    let tree: TreeNode = {"tokenId": 0, "child": 0, "owners": [], "sources": []};
+    history.forEach(function(token) {
+        // Handle Empty info
+        if(token.tokenId == 0) {
+            return;
+        }
+        // process owners to have name;
+        token.owners.forEach(function(owner: string) {
+            return owner = owner + ': ' + getOwnerName(owner)
+        });
+        // Handle token head
+        if(token.tokenId == head) {
+            tree = {"tokenId": token.tokenId, "child": 0, "owners": token.owners, "sources": []};
+        } else {
+            let child = history[idMap[token.child]]
+            let node = {"tokenId": token.tokenId, "child": token.child, "owners": token.owners, "sources": []};
+            child["sources"].push(node);
+        }
+    });
+    return tree;
+}
+
+function getOwnerName(address: string) {
+    // implement get owner name from offchain database
+    return 'Steves Farm'
 }

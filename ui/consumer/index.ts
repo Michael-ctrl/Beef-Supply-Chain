@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
-import { addWallet, getBalance, initialiseContract, initialiseProvider, getTokenInfo } from './consumer'
+import { addWallet, getBalance, initialiseContract, initialiseProvider, getTokenInfo, getTokenHistory, getTokenOwners } from './consumer'
 import { methodSend } from '../lib/transact'
 
 var vorpal = require('vorpal')();
@@ -61,8 +61,9 @@ vorpal
             if (!contract) {
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
-                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'getHistory', contract.options.address, [args.tokenId, 100]);  
-                console.log(receipt.logs);
+                let meatHistory: any = {};
+                meatHistory = await getTokenHistory(contract, args.tokenId);
+                self.log(meatHistory);
             }
             callback();
         }
@@ -83,8 +84,12 @@ vorpal
                 self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
             } else {
                 let meatInfo: any = [];
-                meatInfo = await getTokenInfo(web3, contract, account, args.tokenId);
-                self.log(meatInfo)
+                meatInfo = await getTokenInfo(contract, args.tokenId);
+                let meatOwners: any = [];
+                meatOwners = await getTokenOwners(contract, args.tokenId);
+                self.log(meatInfo);
+                self.log(chalk.gray('List of owners of this piece of meat'));
+                self.log(meatOwners);
             }
             callback();
         }

@@ -37,6 +37,7 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         uint256 tokenId;
         uint256 child;
         address[] owners;
+        uint256[] sources;
     }
 
     mapping (uint256 => MeatInfo) public idToInfo;
@@ -114,7 +115,8 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         history[index] = (viewHistory({
             tokenId: _tokenId, 
             owners: ownersHistory[_tokenId],
-            child: _child
+            child: _child,
+            sources: new uint256[](0)
         }));
         index++;
         for (uint i=0; i<sourcesHistory[_tokenId].length; i++) {
