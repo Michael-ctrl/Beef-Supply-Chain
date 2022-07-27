@@ -6,6 +6,7 @@ import { Contract } from 'web3-eth-contract'; // contract type
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
 import { getTokenHistory, getTokenOwners, getTokenInfo } from '../consumer/consumer'
 import { methodSend, sendEther } from '../lib/transact'
+import inquirer from 'inquirer';
 // firebase import
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, collection, addDoc, updateDoc, getDoc} from "firebase/firestore";
@@ -17,6 +18,12 @@ let contract: Contract;
 let voting: Contract;
 let tokens: any = [];
 
+interface Out { 
+    description: string;
+    location: string;
+    quantity: number;
+    weight: number;
+}
 // Initialization for firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDE4B921jYQ2nsOeRk5qZwkKzkowc-u8vI",
@@ -38,12 +45,20 @@ vorpal
     .hidden()
     .option('-k, --key <privateKey>', 'Private key of your wallet')
     .option('-c, --contract <contractAddress>', 'Address of the NFT contract')
+    .option('-v, --voting <contractAddress>', 'Address of the voting contract')
     .types({
         string: ['k', 'key', 'c', 'contract']
     })
     .action(function (this:any, args: any, callback: any) {
-        setupcontract(this, args.options.contract);
-        setupwallet(this, args.options.key);
+        if (args.options.key) {
+            setupwallet(this, args.options.key);
+        }
+        if (args.options.contract) {
+            setupcontract(this, args.options.contract);
+        }
+        if (args.options.voting) {
+            setupvoting(this, args.options.voting);
+        }
         callback();
     });
 
@@ -81,16 +96,11 @@ vorpal
     .alias('balance')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
-        if (!account) {
-            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
-            callback();
-        } else {
+        if (checkAccount()) {
             // Get balance in ether
             self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
 
-            if (!contract) {
-                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
-            } else {
+            if (checkContract()) {
                 // Get list of tokens
                 tokens = await getTokens(web3, contract, account);
                 if (tokens.length > 1) {
@@ -112,12 +122,8 @@ vorpal
     .option('-w, --weight <weight>', 'Weight of the item')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
-        if (!account) {
-            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
-        } else {
-            if (!contract) {
-                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
-            } else {
+        if (checkAccount()) {
+            if (checkContract()) {
                 // Setup defaults
                 if (!args.options.description) {
                     args.options.description = 'Default Meat Description';
@@ -154,15 +160,9 @@ vorpal
     .types({string: ['_']})
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
-        if (!account) {
-            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
-        } else {
-            if (!contract) {
-                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
-            } else {
-                if (!voting) {
-                    self.log(chalk.redBright('Error: ') + 'Please connect to a voting contract with ' + chalk.gray('voting <contractAddress>'));
-                } else {
+        if (checkAccount()) {
+            if (checkContract()) {
+                if (checkVoting()) {
                     // Check if token exists and is owned by user
                     // Update tokens list
                     tokens = await getTokens(web3, contract, account);
@@ -195,6 +195,44 @@ vorpal
         }
         callback();
     });
+
+// Split/merge
+vorpal
+    .command('splitmerge', 'Split/merge a set of tokens')
+    .alias('sm')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (checkAccount()) {
+            if (checkContract()) {
+                tokens = await getTokens(web3, contract, account); // update token list
+                let inputList: number[] = [];
+                await inquirer.prompt([{
+                    type: 'checkbox',
+                    name: 'tokens',
+                    message: 'Select tokens to split/merge',
+                    choices: tokens,
+                }]).then(function (answers: any) {
+                    inputList = answers.tokens;
+                });
+
+                let amount: number = 0;
+                await inquirer.prompt([{
+                    type: 'input',
+                    name: 'amount',
+                    message: 'Enter the number of uniqe token types to be created: ',
+                }]).then(function (answers: any) {
+                    amount = answers.amount;
+                });
+                let outputList: Out[] = [];
+                let i = 0;
+                await getDetails(i, amount, outputList);
+                //this.log(outputList);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'splitMerge', contract.options.address, [inputList, outputList]);
+                this.log(chalk.greenBright('Tokens split/merged ') + receipt.transactionHash);
+            }
+        }
+        callback();
+    });
                 
 // Transact Ether
 vorpal
@@ -203,10 +241,7 @@ vorpal
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
 
-        if (!account) {
-            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
-            callback();
-        } else {
+        if (checkAccount()) {
             //send eth
             let receipt = await sendEther(web3, account.address, args.address, web3.utils.toWei(args.amount as string, 'ether'));
             self.log(chalk.greenBright('Transaction sent ') + receipt.transactionHash);
@@ -302,9 +337,8 @@ vorpal.run = function (argv: any, options: any, done: any) {
 
 // Helper functions
 function setupcontract (instance: any, address: string) {
-    //console.log(instance, args);
     contract = initialiseContract(web3, address);
-    instance.log(chalk.greenBright('Loaded contract ABI for ') + address);
+    instance.log(chalk.greenBright('Loaded contract ABI for ') + contract.options.address);
 }
 
 function setupwallet (instance: any, key: string) {
@@ -334,6 +368,71 @@ function setupvoting (instance: any, address: string) {
     voting = initialiseContract(web3, address);
     instance.log(chalk.greenBright('Loaded contract ABI for ') + address);
 }
+
+function checkAccount (): boolean {
+    if (!account) {
+        console.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet <privateKey>'));
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function checkContract (): boolean {
+    if (!contract) {
+        console.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('setupcontract <contractAddress>'));
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function checkVoting (): boolean {
+    if (!voting) {
+        console.log(chalk.redBright('Error: ') + 'Please connect to a voting contract with ' + chalk.gray('setupvoting <contractAddress>'));
+        return false;
+    } else {
+        return true;
+    }
+}
+
+async function getDetails(i: number, amount: number, outputList: Out[]) {
+    await inquirer.prompt(questions).then(async function (answers: any) {
+        outputList.push({
+            description: answers.description,
+            location: answers.location,
+            quantity: answers.quantity,
+            weight: answers.weight,
+        })
+        i++;
+        if (i < amount) {
+            await getDetails(i, amount, outputList);
+        }
+    });
+}
+
+const questions = [
+    {
+        type: 'input',
+        name: 'description',
+        message: 'Enter description: ',
+    },
+    {
+        type: 'input',
+        name: 'location',
+        message: 'Enter location: '
+    },
+    {
+        type: 'input',
+        name: 'weight',
+        message: 'Enter weight: ',
+    },
+    {
+        type: 'input',
+        name: 'quantity',
+        message: 'Enter quantity: ',
+    },
+  ];
 
 vorpal
     .delimiter(chalk.blue('business') + ' > ')
