@@ -156,7 +156,7 @@ vorpal
 
 // Request voting
 vorpal
-    .command('request <tokenID>', 'Request voting')
+    .command('vote <tokenID> [quorum]', 'Request voting')
     .types({string: ['_']})
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
@@ -167,8 +167,11 @@ vorpal
                     // Update tokens list
                     tokens = await getTokens(web3, contract, account);
                     if (tokens.find(args.tokenID)) {
+                        if (!args.quorum) {
+                            args.quorum = 5;
+                        }
                         // Request voting
-                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID]);
+                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID, args.quorum]);
                         self.log(chalk.greenBright('Request sent ') + receipt.transactionHash);
                     }
                 }
@@ -219,7 +222,7 @@ vorpal
                 await inquirer.prompt([{
                     type: 'input',
                     name: 'amount',
-                    message: 'Enter the number of uniqe token types to be created: ',
+                    message: 'Enter the number of unique token types to be created: ',
                 }]).then(function (answers: any) {
                     amount = answers.amount;
                 });
