@@ -5,7 +5,7 @@ import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
 import { methodSend, sendEther } from '../lib/transact'
-
+import inquirer from 'inquirer';
 var vorpal = require('vorpal')();
 
 let web3: Web3 = new Web3(initialiseProvider());
@@ -13,6 +13,13 @@ let account: Account;
 let contract: Contract;
 let voting: Contract;
 let tokens: any = [];
+
+interface Out { 
+    description: string;
+    location: string;
+    quantity: number;
+    weight: number;
+}
 
 // Easy Setup from CLI
 vorpal
@@ -164,66 +171,39 @@ vorpal
 // Split/merge
 vorpal
     .command('splitmerge', 'Split/merge a set of tokens')
+    .alias('sm')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
         if (checkAccount()) {
             if (checkContract()) {
                 tokens = await getTokens(web3, contract, account); // update token list
                 let inputList: number[] = [];
-                interface Out { 
-                    description: string;
-                    location: string;
-                    quantity: number;
-                    weight: number;
-                }
-                let outputList: Out[] = [];
-                return self.prompt({
+                await inquirer.prompt([{
                     type: 'checkbox',
                     name: 'tokens',
                     message: 'Select tokens to split/merge',
-                    choices: tokens
-                }, function(answer: any) {
-                    inputList = answer.tokens;
-                    return self.prompt({
-                        type: 'input',
-                        name: 'amount',
-                        message: 'Enter the number of unique token types to be created: '
-                    }, function(answer: any) {
-                        for (let i = 0; i < answer.amount; i++) {
-                            return self.prompt({
-                                type: 'input',
-                                name: 'description',
-                                message: 'Enter description for type ' + i + ' '
-                            }, function(answer: any) {
-                                let tokenDesc: string = answer.description;
-                                return self.prompt({
-                                    type: 'input',
-                                    name: 'location',
-                                    message: 'Enter location for type ' + i + ' '
-                                }, function(answer: any) {
-                                    let tokenLoc: string = answer.location;
-                                    return self.prompt({
-                                        type: 'input',
-                                        name: 'weight',
-                                        message: 'Enter weight for type ' + i + ' '
-                                    }, function(answer: any) {
-                                        let tokenWeight: number = answer.weight;
-                                        return self.prompt({
-                                            type: 'input',
-                                            name: 'quantity',
-                                            message: 'Enter the number of tokens you would like output: '
-                                        }, function(answer: any) {
-                                            let tokenQuantity: number = answer.quantity;
-                                            outputList.push({description: tokenDesc, location: tokenLoc, quantity: tokenQuantity, weight: tokenWeight});
-                                        });
-                                    });
-                                });
-                            });
-                        }
-                    });
+                    choices: tokens,
+                }]).then(function (answers: any) {
+                    inputList = answers.tokens;
                 });
+
+                let amount: number = 0;
+                await inquirer.prompt([{
+                    type: 'input',
+                    name: 'amount',
+                    message: 'Enter the number of uniqe token types to be created: ',
+                }]).then(function (answers: any) {
+                    amount = answers.amount;
+                });
+                let outputList: Out[] = [];
+                let i = 0;
+                await getDetails(i, amount, outputList);
+                //this.log(outputList);
+                let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'splitMerge', contract.options.address, [inputList, outputList]);
+                this.log(chalk.greenBright('Tokens split/merged ') + receipt.transactionHash);
             }
         }
+        callback();
     });
                 
 // Transact Ether
@@ -322,6 +302,44 @@ function checkVoting (): boolean {
         return true;
     }
 }
+
+async function getDetails(i: number, amount: number, outputList: Out[]) {
+    await inquirer.prompt(questions).then(async function (answers: any) {
+        outputList.push({
+            description: answers.description,
+            location: answers.location,
+            quantity: answers.quantity,
+            weight: answers.weight,
+        })
+        i++;
+        if (i < amount) {
+            await getDetails(i, amount, outputList);
+        }
+    });
+}
+
+const questions = [
+    {
+        type: 'input',
+        name: 'description',
+        message: 'Enter description: ',
+    },
+    {
+        type: 'input',
+        name: 'location',
+        message: 'Enter location: '
+    },
+    {
+        type: 'input',
+        name: 'weight',
+        message: 'Enter weight: ',
+    },
+    {
+        type: 'input',
+        name: 'quantity',
+        message: 'Enter quantity: ',
+    },
+  ];
 
 vorpal
     .delimiter(chalk.blue('business') + ' > ')
