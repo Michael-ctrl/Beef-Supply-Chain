@@ -26,11 +26,11 @@ vorpal
             let loaded = loadCompiledSols(["MeatNFT"]);
             //console.log(loaded)
             contract = await deployContract(web3!, account, loaded.contracts["MeatNFT"]["MeatNFT"].abi, loaded.contracts["MeatNFT"]["MeatNFT"].evm.bytecode.object);
-            console.log("user app contract address: " + contract.options.address);
+            console.log(chalk.greenBright("Contract deployed at: ") + contract.options.address);
             setupcontract(this, contract.options.address);
             setupwallet(this, account.privateKey);
         } catch (error) {
-            console.error("error deploying contract");
+            console.error("Error deploying contract: ");
             console.error(error);
         }
         callback();
@@ -44,7 +44,7 @@ vorpal
         let loaded = loadCompiledSols(["Voting"]);
         //console.log(loaded)
         voteContract = await deployContract(web3!, account, loaded.contracts["Voting"]["Voting"].abi, loaded.contracts["Voting"]["Voting"].evm.bytecode.object);
-        console.log("user app contract address: " + voteContract.options.address);
+        console.log(chalk.greenBright("Contract deployed at: ") + voteContract.options.address);
     } catch (error) {
         console.error("error deploying contract");
         console.error(error);
@@ -170,6 +170,6 @@ vorpal.run = function (argv: any, options: any, done: any) {
 };
 
 vorpal
-    .delimiter(chalk.blue('manager') + ' > ')
+    .delimiter(chalk.yellow('manager') + ' > ')
     .run(process.argv)
     .show();

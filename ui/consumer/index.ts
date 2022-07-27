@@ -189,6 +189,6 @@ function setupwallet (instance: any, key: string) {
 }
 
 vorpal
-    .delimiter(chalk.blue('consumer') + ' > ')
+    .delimiter(chalk.green('consumer') + ' > ')
     .run(process.argv)
     .show();

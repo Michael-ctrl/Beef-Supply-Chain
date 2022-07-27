@@ -156,7 +156,7 @@ vorpal
 
 // Request voting
 vorpal
-    .command('request <tokenID>', 'Request voting')
+    .command('vote <tokenID>', 'Request voting')
     .types({string: ['_']})
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
@@ -219,7 +219,7 @@ vorpal
                 await inquirer.prompt([{
                     type: 'input',
                     name: 'amount',
-                    message: 'Enter the number of uniqe token types to be created: ',
+                    message: 'Enter the number of unique token types to be created: ',
                 }]).then(function (answers: any) {
                     amount = answers.amount;
                 });
