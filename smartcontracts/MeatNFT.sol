@@ -159,9 +159,11 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         for (uint i=0; i < inputs.length; i++) {
             require(ownerOf(inputs[i]) == msg.sender, "One of the tokens does not belong to the caller");
         }
-        uint sizeOfArray = 0;
         for (uint i=0; i < inputs.length; i++) {
             _burn(inputs[i]);
+        }
+        uint sizeOfArray = 0;
+        for (uint i = 0; i < outputs.length; i++) {
             sizeOfArray += outputs[i].quantity;
         }
         uint256[] memory tokens = new uint256[](sizeOfArray); 
