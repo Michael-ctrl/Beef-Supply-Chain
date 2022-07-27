@@ -2,8 +2,6 @@ import Web3 from 'web3'; // web3.js library
 import { WebsocketProvider, Account } from 'web3-core'; // provider for blockchain and account type
 import { Contract } from 'web3-eth-contract'; // contract type
 import { loadCompiledSols } from './load'; // compiling and loading ABI function
-import { deployContract } from './deploy'; // deployment function (for testing)
-import { Address } from 'cluster'; // Address type
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
@@ -75,6 +73,7 @@ if (shellArgs.length < 1) {
     var cmd0 = shellArgs[0];
 
     // Deploy contract to be listened to and return address
+
     if (cmd0 == "deploy") {
         if (shellArgs.length < 2) {
             console.error("e.g. node index.js deploy MeatNFT");

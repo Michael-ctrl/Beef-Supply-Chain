@@ -61,7 +61,7 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         string memory _description, 
         string memory _location, 
         uint _weight
-    ) public returns (uint256) {
+    ) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         string memory tokenURI = string(abi.encodePacked(Strings.toString(newItemId)," ",Strings.toHexString(address(this))));
         _mint(msg.sender, newItemId);

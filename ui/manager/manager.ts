@@ -1,6 +1,39 @@
 import Web3 from 'web3';
-import { Account } from 'web3-core';
+import { Account, WebsocketProvider } from 'web3-core';
+import { loadCompiledSols } from '../lib/load';
+import chalk from 'chalk';
 import { Contract, DeployOptions } from 'web3-eth-contract';
+
+let fs = require('fs');
+
+export function initialiseContract(web3: Web3, contractAddress: string): Contract {
+    try {
+        let loaded = loadCompiledSols(["MeatNFT"]);
+        //console.log(loaded);
+        return new web3.eth.Contract(loaded.contracts["MeatNFT"]["MeatNFT"].abi, contractAddress);
+    } catch (error) {
+        throw chalk.redBright("Cannot read contract " + error);
+    }
+}
+
+export function initialiseProvider(): WebsocketProvider {
+    try {
+        let provider_data = fs.readFileSync('json/providers.json');
+        let provider_json = JSON.parse(provider_data);
+        let provider_link = provider_json["provider_link"];
+        return new Web3.providers.WebsocketProvider(provider_link);
+    } catch (error) {
+        throw chalk.redBright("Cannot read provider: " + error);
+    }
+}
+
+export function addWallet(web3: Web3, privateKey: string): Account {
+    try {
+        return web3.eth.accounts.wallet.add(privateKey)
+    } catch (error) {
+        throw(chalk.redBright("Cannot add wallet: " + error));
+    }
+}
 
 class Helper {
     static gas_mulptiplier: number = 1.2;
