@@ -151,7 +151,7 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
     // Creates 'quantity' tokens for each outputMeat, disables the input tokens 
     // and records the transfomation in tracking history.
     //
-    // Input for 'outputs' in form of [["descr", "loc", 1, 1],[...]]
+    // Input for 'outputs' in form of [["descr", "loc", quantity(int), weight(int)],[...]]
     function splitMerge(
         uint256[] memory inputs, 
         OutputMeat[] calldata outputs
@@ -159,16 +159,17 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         for (uint i=0; i < inputs.length; i++) {
             require(ownerOf(inputs[i]) == msg.sender, "One of the tokens does not belong to the caller");
         }
+        uint sizeOfArray = 0;
         for (uint i=0; i < inputs.length; i++) {
             _burn(inputs[i]);
+            sizeOfArray += outputs[i].quantity;
         }
-        uint256[] memory tokens = new uint256[](0);
+        uint256[] memory tokens = new uint256[](sizeOfArray); 
         uint a = 0;
         for (uint i = 0; i < outputs.length; i++) {
             for (uint j = 0; j < outputs[i].quantity; j++) {
                 uint256 token = (createMeat(outputs[i].description, outputs[i].location, outputs[i].weight));
                 sourcesHistory[token] = inputs;
-                ownersHistory[token] = [msg.sender];
                 tokens[a] = token;
                 a++;
             }
