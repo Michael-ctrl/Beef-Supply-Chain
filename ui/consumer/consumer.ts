@@ -73,7 +73,7 @@ export async function getTokenInfo(contract: Contract, tokenId: number) {
 export async function getTokenOwners(contract: Contract, tokenId: number) {
     let meatInfo: Object;
     try {
-        meatInfo = await contract.methods.getMeatInfo(tokenId).call();
+        meatInfo = await contract.methods.ownersHistory(tokenId).call();
     } catch (error) {
         return [];
     }
