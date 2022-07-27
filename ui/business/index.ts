@@ -4,6 +4,7 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
+import { getTokenHistory, getTokenOwners, getTokenInfo } from '../consumer/consumer'
 import { methodSend, sendEther } from '../lib/transact'
 
 var vorpal = require('vorpal')();
@@ -182,6 +183,54 @@ vorpal
             //send eth
             let receipt = await sendEther(web3, account.address, args.address, web3.utils.toWei(args.amount as string, 'ether'));
             self.log(chalk.greenBright('Transaction sent ') + receipt.transactionHash);
+            callback();
+        }
+    });
+
+vorpal
+    .command('viewMeatHistory <tokenId>', 'View History and grading data of original cows')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+            callback();
+        } else {
+            // Get balance in ether
+            self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
+
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                let meatHistory: any = {};
+                meatHistory = await getTokenHistory(contract, args.tokenId);
+                self.log(meatHistory);
+            }
+            callback();
+        }
+    });
+
+vorpal
+    .command('viewMeatInfo <tokenId>', 'View on-chain info of any token')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+            callback();
+        } else {
+            // Get balance in ether
+            self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
+
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                let meatInfo: any = [];
+                meatInfo = await getTokenInfo(contract, args.tokenId);
+                let meatOwners: any = [];
+                meatOwners = await getTokenOwners(contract, args.tokenId);
+                self.log(meatInfo);
+                self.log(chalk.gray('List of owners of this piece of meat'));
+                self.log(meatOwners);
+            }
             callback();
         }
     });

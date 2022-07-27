@@ -127,10 +127,12 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
     }
 
     function getHistory(uint256 _tokenId, uint historySize) public returns (viewHistory[] memory) {
+        //require(_exists(_tokenId), 'Token does not exist');
         return traverseHistory(_tokenId, 0, 0, new viewHistory[](historySize));
     }
 
     function getMeatInfo(uint256 tokenId) public view returns (MeatInfo memory, address[] memory) {
+        //require(_exists(tokenId), 'Token does not exist');
         return (idToInfo[tokenId], ownersHistory[tokenId]);
     }
 

@@ -70,7 +70,7 @@ vorpal
     });
 
 vorpal
-    .command('viewTokenInfo <tokenId>', 'View on-chain info of any token')
+    .command('viewMeatInfo <tokenId>', 'View on-chain info of any token')
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
         if (!account) {
