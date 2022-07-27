@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "./Voting.sol";
 
 contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable {
     using Counters for Counters.Counter;
@@ -208,4 +207,8 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         return super.tokenURI(tokenId);
     }
 
+}
+
+contract Voting{
+    function meat_enqueue(uint256 meatid, uint quorum) public{}
 }
