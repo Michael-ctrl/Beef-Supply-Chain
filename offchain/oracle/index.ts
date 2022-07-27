@@ -73,42 +73,7 @@ if (shellArgs.length < 1) {
     var cmd0 = shellArgs[0];
 
     // Deploy contract to be listened to and return address
-
-    if (cmd0 == "deploy") {
-        if (shellArgs.length < 2) {
-            console.error("e.g. node index.js deploy MeatNFT");
-            process.exit(1);
-        }
-
-        if (shellArgs[1] == "MeatNFT") {
-            try {
-                let account = getAccount(web3, "user");
-                let loaded = loadCompiledSols(["MeatNFT"]);
-                //console.log(loaded)
-                let contract = await deployContract(web3!, account, loaded.contracts["MeatNFT"]["MeatNFT"].abi, loaded.contracts["MeatNFT"]["MeatNFT"].evm.bytecode.object);
-                console.log("user app contract address: " + contract.options.address);
-            } catch (error) {
-                console.error("error deploying contract");
-                console.error(error);
-            }
-            try {
-                let account = getAccount(web3, "user");
-                let loaded = loadCompiledSols(["Voting"]);
-                console.log(loaded)
-                let contract = await deployContract(web3!, account, loaded.contracts["Voting"]["Voting"].abi, loaded.contracts["Voting"]["Voting"].evm.bytecode.object);
-                console.log("user app contract address: " + contract.options.address);
-            } catch (error) {
-                console.error("error deploying voting contract");
-                console.error(error);
-            }
-        } else {
-            console.error("Unknown contract");
-            process.exit(1);
-        }
-        web3Provider.disconnect(1000, 'Normal Closure');
-
-    // Listen to contract events
-    } else if (cmd0 = "listen") {
+    if (cmd0 = "listen") {
         if (shellArgs.length < 3) {
             console.error("e.g. node index.js listen contractAddress");
             process.exit(1);
