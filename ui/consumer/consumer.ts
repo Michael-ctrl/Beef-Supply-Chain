@@ -16,12 +16,16 @@ type ArrayIndexable = {
     [tokenId: number]: number;
 }
 
-type TreeNode = {
+interface TreeNode {
     tokenId: number;
     child: number;
     owners: string[];
     sources: TreeNode[];
 }
+
+type Mutable<Type> = {
+    -readonly [Key in keyof Type]: Type[Key];
+  };
 
 export function initialiseContract(web3: Web3, contractAddress: string): Contract {
     try {
@@ -87,40 +91,35 @@ export async function getTokenHistory(contract: Contract, tokenId: number) {
     } catch (error) {
         return [];
     }
-    return parseHistory(meatHistory, tokenId);
+    let history: TreeNode[] = [];
+    meatHistory.forEach(function(token) {
+        if (token.tokenId != 0) {
+            history.push({"tokenId": token.tokenId, "child": token.child, "owners": token.owners, "sources": [] as TreeNode[]})
+        }
+    })
+    
+    return parseHistory(history, tokenId, history[0]);
 }
 
-export function parseHistory(history: TreeNode[], head: number) {
-    //Map tokenId to Array index
-    let idMap: ArrayIndexable;
-    const idMapping = history.reduce((acc: ArrayIndexable, token: TreeNode, i) => {
-        acc[token.tokenId] = i;
-        return acc;
-      }, {});
 
-    let tree: TreeNode = {"tokenId": 0, "child": 0, "owners": [], "sources": []};
-    history.forEach(function(token) {
-        // Handle Empty info
-        if(token.tokenId == 0) {
-            return;
-        }
-        // process owners to have name;
-        token.owners.forEach(function(owner: string) {
-            return owner = owner + ': ' + getOwnerName(owner)
-        });
-        // Handle token head
-        if(token.tokenId == head) {
-            tree = {"tokenId": token.tokenId, "child": 0, "owners": token.owners, "sources": []};
+export function parseHistory(historylist: TreeNode[], head: number, reference: TreeNode) {
+    // get list of nodes with child head
+    // for each  in the list 
+    if (historylist.length == 0) {
+        return;
+    }
+    let temp: TreeNode[] = [];
+    let temp2: TreeNode[] = [];
+    historylist.forEach(function(token) {
+        if (token.child == head) {
+            temp.push(token)
         } else {
-            let child = history[idMap[token.child]]
-            let node = {"tokenId": token.tokenId, "child": token.child, "owners": token.owners, "sources": []};
-            child["sources"].push(node);
+            temp2.push(token)
         }
     });
-    return tree;
-}
-
-function getOwnerName(address: string) {
-    // implement get owner name from offchain database
-    return 'Steves Farm'
+    temp.forEach(function(token) {
+        parseHistory(temp2, token.tokenId, token);
+    })
+    reference.sources = temp;
+    return reference;
 }
