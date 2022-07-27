@@ -265,7 +265,10 @@ vorpal
             } else {
                 let meatHistory: any = {};
                 meatHistory = await getTokenHistory(contract, args.tokenId);
-                self.log(meatHistory);
+                //self.log(meatHistory)
+                let str = JSON.stringify(meatHistory);
+                str = JSON.stringify(meatHistory, null, 4);
+                self.log(str);
             }
             callback();
         }
