@@ -156,7 +156,7 @@ vorpal
 
 // Request voting
 vorpal
-    .command('vote <tokenID> [quorum]', 'Request voting')
+    .command('vote <tokenID>', 'Request voting')
     .types({string: ['_']})
     .action(async function (this: any, args: any, callback: any) {
         const self = this;
@@ -167,11 +167,8 @@ vorpal
                     // Update tokens list
                     tokens = await getTokens(web3, contract, account);
                     if (tokens.find(args.tokenID)) {
-                        if (!args.quorum) {
-                            args.quorum = 5;
-                        }
                         // Request voting
-                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID, args.quorum]);
+                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID]);
                         self.log(chalk.greenBright('Request sent ') + receipt.transactionHash);
                     }
                 }
