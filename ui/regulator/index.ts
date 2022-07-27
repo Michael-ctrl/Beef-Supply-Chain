@@ -305,6 +305,6 @@ async function doUpload(instance: any, args: any){
 }
 
 vorpal
-    .delimiter('regulator > ')
+    .delimiter(chalk.magenta('regulator > '))
     .run(process.argv)
     .show();
