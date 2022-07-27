@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "./Voting.sol";
 
 contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable {
     using Counters for Counters.Counter;
@@ -37,7 +38,9 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         uint256 tokenId;
         uint256 child;
         address[] owners;
+        uint8[] sources;
     }
+    uint8[] empty = new uint8[](0);
 
     mapping (uint256 => MeatInfo) public idToInfo;
 
@@ -110,11 +113,12 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         uint256 _child, 
         viewHistory[] memory history
     ) private returns (viewHistory[] memory) {
-        
+
         history[index] = (viewHistory({
             tokenId: _tokenId, 
             owners: ownersHistory[_tokenId],
-            child: _child
+            child: _child,
+            sources: empty
         }));
         index++;
         for (uint i=0; i<sourcesHistory[_tokenId].length; i++) {
@@ -125,11 +129,8 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
     }
 
     function getHistory(uint256 _tokenId, uint historySize) public returns (viewHistory[] memory) {
+        require(_exists(_tokenId), 'Token does not exist');
         return traverseHistory(_tokenId, 0, 0, new viewHistory[](historySize));
-    }
-
-    function getMeatInfo(uint256 tokenId) public view returns (MeatInfo memory, address[] memory) {
-        return (idToInfo[tokenId], ownersHistory[tokenId]);
     }
 
     // Interaction with voting contract
@@ -207,8 +208,4 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         return super.tokenURI(tokenId);
     }
 
-}
-
-contract Voting{
-    function meat_enqueue(uint256 meatid, uint quorum) public{}
 }

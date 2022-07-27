@@ -4,8 +4,11 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './business'
-import { methodSend } from '../lib/transact'
-
+import { getTokenHistory, getTokenOwners, getTokenInfo } from '../consumer/consumer'
+import { methodSend, sendEther } from '../lib/transact'
+// firebase import
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, setDoc, collection, addDoc, updateDoc, getDoc} from "firebase/firestore";
 var vorpal = require('vorpal')();
 
 let web3: Web3 = new Web3(initialiseProvider());
@@ -13,6 +16,21 @@ let account: Account;
 let contract: Contract;
 let voting: Contract;
 let tokens: any = [];
+
+// Initialization for firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDE4B921jYQ2nsOeRk5qZwkKzkowc-u8vI",
+    authDomain: "meatnft-1385e.firebaseapp.com",
+    projectId: "meatnft-1385e",
+    storageBucket: "meatnft-1385e.appspot.com",
+    messagingSenderId: "242420508999",
+    appId: "1:242420508999:web:0d4c4af6c0306d4b50c462"
+  };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
 
 // Easy Setup from CLI
 vorpal
@@ -75,7 +93,7 @@ vorpal
             } else {
                 // Get list of tokens
                 tokens = await getTokens(web3, contract, account);
-                if (tokens) {
+                if (tokens.length > 1) {
                     self.log('Tokens:\n' + tokens.join('\n'));
                 } else {
                     self.log(chalk.redBright('Error: ') + 'No tokens found in your wallet');
@@ -119,6 +137,16 @@ vorpal
         }
         callback();
     });
+
+//get firebase data
+vorpal
+.command('getData', 'Get image URL data')
+.option('-i, --tokenURI <tokenURI>', 'tokenURI')
+.types({string: ['i', 'tokenURI']})
+.action(function (this:any, args: any, callback: any) {
+    getData(this, args);
+    callback();
+});
 
 // Request voting
 vorpal
@@ -180,7 +208,56 @@ vorpal
             callback();
         } else {
             //send eth
-            self.log(chalk.greenBright('Transaction sent '));
+            let receipt = await sendEther(web3, account.address, args.address, web3.utils.toWei(args.amount as string, 'ether'));
+            self.log(chalk.greenBright('Transaction sent ') + receipt.transactionHash);
+            callback();
+        }
+    });
+
+vorpal
+    .command('viewMeatHistory <tokenId>', 'View History and grading data of original cows')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+            callback();
+        } else {
+            // Get balance in ether
+            self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
+
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                let meatHistory: any = {};
+                meatHistory = await getTokenHistory(contract, args.tokenId);
+                self.log(meatHistory);
+            }
+            callback();
+        }
+    });
+
+vorpal
+    .command('viewMeatInfo <tokenId>', 'View on-chain info of any token')
+    .action(async function (this: any, args: any, callback: any) {
+        const self = this;
+        if (!account) {
+            self.log(chalk.redBright('Error: ') + 'Please setup your wallet with ' + chalk.gray('setupwallet'));
+            callback();
+        } else {
+            // Get balance in ether
+            self.log(chalk.greenBright('Balance: ') + web3.utils.fromWei(await getBalance(web3, account), 'ether') + ' ETH');
+
+            if (!contract) {
+                self.log(chalk.redBright('Error: ') + 'Please connect to a contract with ' + chalk.gray('contract <contractAddress>'));
+            } else {
+                let meatInfo: any = [];
+                meatInfo = await getTokenInfo(contract, args.tokenId);
+                let meatOwners: any = [];
+                meatOwners = await getTokenOwners(contract, args.tokenId);
+                self.log(meatInfo);
+                self.log(chalk.gray('List of owners of this piece of meat'));
+                self.log(meatOwners);
+            }
             callback();
         }
     });
@@ -234,6 +311,23 @@ function setupwallet (instance: any, key: string) {
     const self = instance;
     account = addWallet(web3, key);
     instance.log(chalk.greenBright('Wallet added ') + account.address);
+}
+
+async function getData(instance: any, args: any){
+    if(args.options.tokenURI){
+        const docRef = doc(db, "meatNFTs", args.options.tokenURI);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            // Convert to City object
+            const meat = docSnap.data();
+            // Use a City instance method
+            instance.log(meat);
+          } else {
+            instance.log("No such document!");
+          }
+    }else{
+        instance.log("No token id provided");
+    }
 }
 
 function setupvoting (instance: any, address: string) {

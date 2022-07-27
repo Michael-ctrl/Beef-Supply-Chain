@@ -47,9 +47,14 @@ export async function getBalance(web3: Web3, account: Account): Promise<string> 
 
 export async function getTokens(web3: Web3, contract: Contract, account: Account) {
     // Get number of tokens
-    let numTokens = await contract.methods.balanceOf(account.address).call();
-    if (numTokens == 0) {
-        return
+    let numTokens: number;
+    try {
+        numTokens = await contract.methods.balanceOf(account.address).call();
+        if (numTokens == 0) {
+            return [];
+        }
+    } catch (error) {
+        return [];
     }
 
     // Get list of NFTs
