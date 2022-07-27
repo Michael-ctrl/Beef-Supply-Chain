@@ -104,13 +104,23 @@ vorpal
         callback();
     });
 
-    // Update data
+// get url
 vorpal
 .command('getURL', 'Get image URL data')
 .option('-i, --tokenURI <tokenURI>', 'tokenURI')
 .types({string: ['i', 'tokenURI']})
 .action(function (this:any, args: any, callback: any) {
     getURL(this, args);
+    callback();
+});
+
+// get data
+vorpal
+.command('getData', 'Get image URL data')
+.option('-i, --tokenURI <tokenURI>', 'tokenURI')
+.types({string: ['i', 'tokenURI']})
+.action(function (this:any, args: any, callback: any) {
+    getData(this, args);
     callback();
 });
 
@@ -203,6 +213,23 @@ async function getURL(instance: any, args: any){
             const meat = docSnap.data();
             // Use a City instance method
             instance.log(meat.image);
+          } else {
+            instance.log("No such document!");
+          }
+    }else{
+        instance.log("No token id provided");
+    }
+}
+
+async function getData(instance: any, args: any){
+    if(args.options.tokenURI){
+        const docRef = doc(db, "meatNFTs", args.options.tokenURI);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            // Convert to City object
+            const meat = docSnap.data();
+            // Use a City instance method
+            instance.log(meat);
           } else {
             instance.log("No such document!");
           }
