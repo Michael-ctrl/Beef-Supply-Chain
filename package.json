@@ -3,11 +3,13 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "bui": "tsc && node build/ui/business/index.js setup -k 0x0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308",
+        "bui1": "tsc && node build/ui/business/index.js setup -k 0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
+        "bui2": "tsc && node build/ui/business/index.js setup -k d4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
         "chain": "ganache --wallet.seed test",
-        "rui": "tsc && node build/ui/regulator/index.js setup -k 0xd4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x1648d20B7f6BC5A4fBb88c140D62eA56236F7f0F",
+        "rui": "tsc && node build/ui/regulator/index.js setup -k 0xd4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x39298d9b6f31709c459008ce7ceEF5eCB1153b5d",
         "mui": "tsc && node build/ui/manager/index.js",
-        "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x565ec3d32a5793f7d0becba39c5f4f2b58a4d308"
+        "cui": "tsc && node build/ui/consumer/index.js setup -k a1a5f790fad4dedb53fc9688ffd464a86872f51033565444a63fa6e93eaace5a -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
+        "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x08510c6ee24861484dF5F2cD891561C906EaA26E"
     },
     "keywords": [],
     "contributors": [
@@ -35,8 +37,11 @@
         "axios": "^0.21.1",
         "chalk": "^4.1.2",
         "firebase": "^9.9.1",
+        "ganache": "^7.3.2",
         "inquirer": "^8.2.4",
+        "print-tree": "^0.1.5",
         "solc": "^0.8.5",
+        "treeify": "^1.1.0",
         "vorpal": "^1.12.0",
         "vorpal-as-default": "^0.0.2",
         "web3": "^1.3.6"

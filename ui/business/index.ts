@@ -166,9 +166,9 @@ vorpal
                     // Check if token exists and is owned by user
                     // Update tokens list
                     tokens = await getTokens(web3, contract, account);
-                    if (tokens.find(args.tokenID)) {
+                    if (tokens.find((element: any) => element == args.tokenID)) {
                         // Request voting
-                        let receipt = await methodSend(web3, account, voting.options.jsonInterface, 'requestVoting', voting.options.address, [args.tokenID]);
+                        let receipt = await methodSend(web3, account, contract.options.jsonInterface, 'requestVoting', contract.options.address, [args.tokenID, voting.options.address]);
                         self.log(chalk.greenBright('Request sent ') + receipt.transactionHash);
                     }
                 }
