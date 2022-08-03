@@ -6,7 +6,7 @@
         "bui1": "tsc && node build/ui/business/index.js setup -k 0ac431843af62030d596973c914ff3eafa6edde5dd261af63a827beb28ace826 -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
         "bui2": "tsc && node build/ui/business/index.js setup -k d4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
         "chain": "ganache --wallet.seed test",
-        "rui": "tsc && node build/ui/regulator/index.js setup -k 0xd4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x39298d9b6f31709c459008ce7ceEF5eCB1153b5d",
+        "rui": "tsc && node build/ui/regulator/index.js setup -k 0xd4732a06cefcfc9e89336a29db7038cd61143128bddea69309646b45dd3d406c -c 0x1648d20B7f6BC5A4fBb88c140D62eA56236F7f0F",
         "mui": "tsc && node build/ui/manager/index.js",
         "cui": "tsc && node build/ui/consumer/index.js setup -k a1a5f790fad4dedb53fc9688ffd464a86872f51033565444a63fa6e93eaace5a -c 0x08510c6ee24861484dF5F2cD891561C906EaA26E",
         "oracle": "tsc && node build/offchain/oracle/index.js listen MeatNFT 0x08510c6ee24861484dF5F2cD891561C906EaA26E"
