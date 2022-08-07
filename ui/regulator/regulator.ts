@@ -57,3 +57,14 @@ export async function getTokens(web3: Web3, contract: Contract, account: Account
 
     return tokens;
 }
+
+export async function getVotingMeat(web3: Web3, contract: Contract, account: Account) {
+    // Get number of tokens
+    let CurrentMeat: number;
+    try {
+        CurrentMeat = await contract.methods.CurrentMeat().call();
+    } catch (error) {
+        return [];
+    }
+    return CurrentMeat;
+}

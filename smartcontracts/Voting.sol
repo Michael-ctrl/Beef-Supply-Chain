@@ -115,6 +115,10 @@ contract Voting{
         } 
     }
 
+    function CurrentMeat() view public returns (uint meatid){
+        return queue[queue_first];
+    }
+
     ///@notice function force all functions to end
     function forceDisable() public restricted notdisabled {
         state = voteState.end;

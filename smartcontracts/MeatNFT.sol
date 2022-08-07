@@ -138,8 +138,8 @@ contract MeatNFT is ERC721URIStorage, ERC721Enumerable, AccessControlEnumerable 
         // person who can start voting needs to own the token
         require(ownerOf(tokenId) == msg.sender, "Meat voting can only be request by the NFT owner");
         voting_contract = Voting(voting_contract_addr);
-        uint quorum = getRoleMemberCount(VOTER_ROLE)/2;
-        voting_contract.meat_enqueue(tokenId, quorum);
+        uint quorum = 1 + getRoleMemberCount(VOTER_ROLE)/2;
+        voting_contract.meat_enqueue(tokenId, 1);
         idToInfo[tokenId].voted = true;
     }
     

@@ -4,7 +4,7 @@ import { Account } from 'web3-core'
 import { Contract } from 'web3-eth-contract'; // contract type
 
 // library import
-import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider } from './regulator'
+import { addWallet, getBalance, getTokens, initialiseContract, initialiseProvider, getVotingMeat } from './regulator'
 import { methodSend } from '../lib/transact'
 let fs = require('fs');
 // firebase import
@@ -111,6 +111,17 @@ vorpal
 .types({string: ['i', 'tokenURI']})
 .action(function (this:any, args: any, callback: any) {
     getURL(this, args);
+    callback();
+});
+
+// get url
+vorpal
+.command('getMeat', 'Get current voting meat id')
+.option('-i, --tokenURI <tokenURI>', 'tokenURI')
+.types({string: ['i', 'tokenURI']})
+.action(async function (this:any, args: any, callback: any) {
+    let meatid = await getVotingMeat(web3, contract, account);
+    console.log(meatid);
     callback();
 });
 
