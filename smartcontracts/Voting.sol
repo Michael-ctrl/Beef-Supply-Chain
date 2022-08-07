@@ -43,7 +43,7 @@ contract Voting{
 
     //  function for meat grade enqueue
     function meat_enqueue(uint256 meat, uint256 quorum) public{
-        required_vote = quorum;
+        required_vote = quorum+1;
         queue_last += 1;
         queue[queue_last] = meat;
         if(state == voteState.create)
@@ -75,8 +75,8 @@ contract Voting{
 
     /// @return validVote Is the vote valid? or trigger final result if 10 regulator has voted or block limit exceed
     function doVote(uint grade, uint256 validation_key, uint256 meat) public votingOpen returns (bool validVote){
-        require(grade <= 80 && grade >= 30);
-        require(queue[queue_first] == meat); // check is meat id matches currently voted one
+        require(grade <= 80 && grade >= 30, "grade not between 30-80");
+        require(queue[queue_first] == meat, "no queue"); // check is meat id matches currently voted one
         validVote = false;                              //Is the vote valid?
         if(block.number > startingBlock + blocklimit){
             finalResult();
