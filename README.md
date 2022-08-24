@@ -8,7 +8,7 @@ Blockchain Management of Beef Supply Chain
   * GetAllTokens(tokens[], input struct, output struct) store AllNewTokens[] on chain; 
   * emit event whenever a split/merge happens to oracle
   
-### Reverse Oracle (Cooper)
+### Reverse Oracle (Michael)
   * Listen for creation events to create new reference to meat
   * When split/merge occurs record new `tokenURI` which represents the meat now
   
@@ -81,3 +81,7 @@ Grade: 7
 ### Regulator UI (Marcus)
   * Vote the meat by the given token ID
   * Upload images and other MSA data
+  
+### Manager UI (Michael)
+  * Deploy supply chain and voting contracts
+  * Manage permissions and roles of different addresses
